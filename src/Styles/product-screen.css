@@ -1,0 +1,23 @@
+
+
+.main-product-screen{
+    display: flex;
+    flex-direction: row;
+    gap: 50px;
+}
+
+
+.product-image-box{
+    display: flex;
+    width: 50%;
+    height: 80%;
+}
+
+.product-image-box img{
+    width: 100%;
+    height: 100%
+}
+
+.product-information__details{
+
+}
