@@ -1,0 +1,36 @@
+/* NORMALIZE */
+
+@import url('normalize.css');
+
+
+/* COMPONENTS STYLES  */
+
+@import url('homescreen.css');
+
+@import url('collectionscreen.css');
+
+@import url('header.css');
+
+@import url('nav-home.css');
+
+@import url('product-screen.css');
+
+
+/* SCREEN STYLES */
+
+
+/* FONTS */
+
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap');
+
+/* SIMILIAR A Univers LT 75 Extra Black */
+
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@800&display=swap');
+
+
+/* ICONS */
+@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css");
+
+
+
+/* RESPONSIVE DESING */

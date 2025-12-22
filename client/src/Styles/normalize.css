@@ -1,0 +1,34 @@
+*{
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    text-decoration: none;
+}
+
+ul {
+    list-style: none;
+}
+
+
+:root{
+    --black: #010101;
+    --bgc-board: #4A154B ;
+    --green-footer: #00FF00;
+}
+
+
+.btn-config{
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+}
+
+.text{
+    color: #F1F1F1;
+}
+
+
+
+
+
