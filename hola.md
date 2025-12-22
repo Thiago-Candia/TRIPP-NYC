@@ -32,9 +32,17 @@ ProductTag (etiquetas/tags)
 Bibliotecas:
 
 Pillow - Procesamiento de imágenes
+librería base de Python para abrir, manipular y guardar muchos formatos de archivo de imagen. Es un requisito previo para ImageKit.
+
 django-imagekit - Optimización de imágenes
+
+Permite automatizar el procesamiento de imágenes (redimensionar, recortar, crear miniaturas) directamente en tus modelos de Django.
+
 django-mptt - Categorías jerárquicas
-django-taggit - Sistema de tags
+categorías de productos. Permite crear estructuras de "árbol" (ej: Ropa > Hombre > Remeras) de forma eficiente en la base de datos.
+
+django-taggit
+agregar etiquetas (tags) a tus modelos, facilitando el filtrado y la búsqueda.
 
 
 3. CART (Carrito de Compras)
