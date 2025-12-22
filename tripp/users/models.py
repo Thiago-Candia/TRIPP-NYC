@@ -45,7 +45,7 @@ Un usuario puede tener 5, 10, 20 direcciones guardadas
 """
 
 
-class UserAdress(models.Model):
+class UserAddress(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='addresses')
     street = models.CharField(max_length=255)
     city = models.CharField(max_length=100)
