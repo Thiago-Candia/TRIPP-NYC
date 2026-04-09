@@ -2,8 +2,8 @@ import React from 'react'
 
 const Footer = () => {
     return (
-        <footer className="footer-container">
-            <div className='footer-content'>
+        <footer className="footer__container">
+            <div className='footer__content'>
                 <p>© 2023 Tripp NYC. All rights reserved.</p>
                 <p>Follow us on social media!</p>
                 <ul className='social-links'>

@@ -12,15 +12,15 @@ const Nav = ({onSearchClick}) => {
             <header>
                 <nav>
                     {/* NAVBAR OPTIONS */}
-                    <div className='nav-item'> 
+                    <div className='nav__item'> 
                     <ul>
                         <li>
-                            <button className='btn-config btn-nav'>
-                                <div className='link-nav'>
+                            <button className='btn-config btn__nav'>
+                                <div className='link__nav__box'>
                                     <Link href="/"> 
-                                        <span className='text'>women</span> 
+                                        <span className='text btn__nav__text'>women</span> 
                                     </Link>
-                                    <ul className='sublinks-nav'>
+                                    <ul className='sublinks__nav__box'>
                                         <li className='sublink-box-nav'>
                                             <Link href="/" className='btn-config btn-sublink-box-nav'>
                                                 <span>new arrivals</span>
@@ -55,37 +55,37 @@ const Nav = ({onSearchClick}) => {
                             </button>
                         </li>
                         <li>
-                            <button className='btn-config btn-nav'>
-                                <div className='link-nav'>
+                            <button className='btn-config btn__nav'>
+                                <div className='link__nav__box'>
                                     <Link href="/"> 
                                         <span className='text'>men</span> 
                                     </Link>
-                                    <ul className='sublinks-nav'>
-                                        <li className=''>
+                                    <ul className='sublinks__nav__box'>
+                                        <li className='sublinks__box'>
                                             <span>new arrivals</span>
                                         </li>
-                                        <li>
+                                        <li className='sublinks__box'>
                                             <span>face covers</span>
                                         </li>
-                                        <li>
+                                        <li className='sublinks__box'>
                                             <span>bottoms</span>
                                         </li>
-                                        <li>
+                                        <li className='sublinks__box'>
                                             <span>top</span>
                                         </li>
-                                        <li>
+                                        <li className='sublinks__box'>
                                             <span>dresses</span>
                                         </li>
-                                        <li>
+                                        <li className='sublinks__box'>
                                             <span>outwear</span>
                                         </li>
-                                        <li>
+                                        <li className='sublinks__box'>
                                             <span>plus size</span>
                                         </li>
-                                        <li>
+                                        <li className='sublinks__box'>
                                             <span>accessories</span>
                                         </li>
-                                        <li>
+                                        <li className='sublinks__box'>
                                             <span>sale</span>
                                         </li>
                                     </ul>
@@ -93,34 +93,34 @@ const Nav = ({onSearchClick}) => {
                             </button>
                         </li>
                         <li>
-                            <button className='btn-config btn-nav'>
-                                <div className='link-nav'>
+                            <button className='btn-config btn__nav'>
+                                <div className='link__nav__box'>
                                     <Link href="/"> 
-                                        <span className='text nav-text'>darkstreet</span> 
+                                        <span className='text nav__btn__text'>darkstreet</span> 
                                     </Link>
-                                    <ul className='sublinks-nav'>
-                                        <li className=''>
+                                    <ul className='sublinks__nav__box'>
+                                        <li className='sublinks__box'>
                                             <span>new arrivals</span>
                                         </li>
-                                        <li>
+                                        <li className='sublinks__box'>
                                             <span>face covers</span>
                                         </li>
-                                        <li>
+                                        <li className='sublinks__box'>
                                             <span>bottoms</span>
                                         </li>
-                                        <li>
+                                        <li className='sublinks__box'>
                                             <span>top</span>
                                         </li>
-                                        <li>
+                                        <li className='sublinks__box'>
                                             <span>dresses</span>
                                         </li>
-                                        <li>
+                                        <li className='sublinks__box'>
                                             <span>outwear</span>
                                         </li>
-                                        <li>
+                                        <li className='sublinks__box'>
                                             <span>plus size</span>
                                         </li>
-                                        <li>
+                                        <li className='sublinks__box'>
                                             <span>accessories</span>
                                         </li>
                                     </ul>
@@ -128,7 +128,7 @@ const Nav = ({onSearchClick}) => {
                             </button>
                         </li>
                         <li>
-                            <button className='btn-config btn-nav'>
+                            <button className='btn-config btn__nav'>
                                 <a href="/"> 
                                     <span className='text'>sale</span>
                                 </a>
@@ -138,31 +138,29 @@ const Nav = ({onSearchClick}) => {
                     </div>
 
                     {/* IMG NAV */}
-                    <div className='nav-item'>
-                        <Link to={"/"} className='logo-nav'>
+                    <div className='nav__item'>
+                        <Link to={"/"} className='logo__nav'>
                             <img src={logoNav}/>
                         </Link>
                     </div>
 
                     {/* CARRITO */}
-                    <div className='nav-item nav-item-bag'>
-                        <button className='btn-config' onClick={onSearchClick}>
-                            <i>
+                    <div className='nav__item nav__item__bag'>
+                        <button className='btn-config nav__item__bag__btn' onClick={onSearchClick}>
+                            <i className='nav__item__bag__btn__icon'>
                                 <Icons.MagnifyingGlass/>
                             </i>
                         </button>
                         <span>
                             <a href="">Account</a>
                         </span>
-                        <div className='nav-bag'>
+                        <div className='nav__bag'>
                             <span>Tote </span>
-                            <div className='bag-img'>
-                                <img src={bag} alt="" />
+                            <div className='nav__bag__box__img'>
+                                <img className='nav__bag__img' src={bag} alt="" />
                             </div>
                         </div>
                     </div>
-
-
                 </nav>
             </header>
         </>

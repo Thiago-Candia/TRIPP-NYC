@@ -3,12 +3,12 @@ import React from 'react'
 const Header = ({isSearchOpen, searchText, setSearchText, handleSearchClick, handleCloseSearch, onCloseHeader}) => {
 
     return (
-    <div className="header-banner">
+    <div className="header__banner">
         {isSearchOpen 
         ? (
-            <div className='header-search'>
+            <div className='header__search'>
                 <input
-                    className='text'
+                    className='input__header__search text '
                     value={searchText} 
                     type="text"
                     onChange={(e) => setSearchText(e.target.value)}

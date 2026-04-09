@@ -7,7 +7,7 @@ header nav{
     background-color: #C60000;
 }
 
-.nav-item{
+.nav__item{
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -15,22 +15,22 @@ header nav{
     width: 100%;
 }
 
-.nav-item-bag{
+.nav__item{
     flex-direction: row;
     align-items: center;
 }
 
-.nav-item-bag button i{
+.nav__item__bag__btn__icon{
     font-size: 20px;
 }
 
-.nav-bag{
+.nav__bag{
     display: flex;
     align-items: center;
     gap: 5px;
 }
 
-.bag-img img{
+.nav__bag__img{
     width: 40px;
     height: 50px;
 }
@@ -45,11 +45,11 @@ ul{
     gap: 5px;
 }
 
-.btn-nav{
+.btn__nav{
     padding: 10px;
 }
 
-.btn-nav span{
+.btn__nav__text{
     color: #000;
     font-family: 'Montserrat', sans-serif;
     font-size: 18px;
@@ -58,7 +58,7 @@ ul{
 
 
 /* LOGO */
-.logo-nav{
+.logo__nav{
 
 }
 
@@ -74,12 +74,12 @@ ul{
 /*  CAJA DESPLEGABLE NAV (WOMEN-MEN-DARKSTREET-SALE)*/
 
 
-.link-nav{
+.link__nav__box{
     position: relative;
     display: inline-block;
 }
 
-.link-nav:hover{
+.sublinks__nav__box:hover{
     display: flex;
     flex-direction: column;
     gap: 1px;
@@ -87,39 +87,33 @@ ul{
 
 /* CAJA SUBLINKS PARA SELECCION (ARRIVALS - BOTTOMS - TOP) */
 
-.sublinks-nav{
+.sublinks__nav__box{
     display: none;
-    position: absolute;
-    top: 70%;
-    left: 0;
-    background-color: #C60000;
-    padding: 10px;
-    border-radius: 5px;
-    box-shadow: 0px 4px 6px rgba(0,0,0,0.1);
-    align-items: flex-start;
-    z-index: 10;
-}
-
-.link-nav:hover .sublinks-nav{
-    display: flex;
+    position: fixed;
     flex-direction: column;
-    width: 800px;
-    align-items: start;
+    top: 110px;
+    left: 0;
+    width: 100vw;
     background-color: #C60000;
-    padding: 10px;
-    border-radius: 5px;
-    background-color: #fff;
+    padding: 10px 0;
+    box-shadow: 0px 4px 6px rgba(0,0,0,0.1);
+    align-items: stretch;
+    z-index: 1000;
 }
 
-.sublinks-nav li{
+.link__nav__box:hover .sublinks__nav__box{
     display: flex;
-    background-color: GREEN;
-    padding: 2px;
+}
+
+.sublinks__box{
+    display: flex;
+    width: 100%;
+    padding: 10px 20px;
     gap: 3px;
 }
 
 
-.nav-text{
+.nav__btn__text{
     color: #000;
     font-family: 'Montserrat', sans-serif;
     font-size: 12px;
@@ -134,24 +128,24 @@ ul{
 
 /* Línea invisible al inicio */
 .text::after {
-  content: '';
-  position: absolute;
-  bottom: -3px; /* espacio bajo la letra */
-  left: 0;
-  width: 0;
-  height: 2px;
-  background-color: black;
-  transition: width 0.36s ease-in-out;
+    content: '';
+    position: absolute;
+    bottom: -3px; /* espacio bajo la letra */
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: black;
+    transition: width 0.36s ease-in-out;
 }
 
 /* Cuando paso el mouse, crece hacia la derecha */
 .text:hover::after {
-  width: 100%;
+    width: 100%;
+}
+
+.sublinks-nav li span:hover {
+    text-decoration: underline;
 }
 
 
 
-.sublink-box-nav{
-    display: flex;
-    background-color: blue;
-}

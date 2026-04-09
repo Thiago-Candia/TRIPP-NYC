@@ -1,0 +1,62 @@
+
+.gram-section{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin-top: 40px;
+}
+
+.gram-section h2{
+    margin-left: 50px;
+    margin-bottom: 20px;
+}
+
+.gram-images-container{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.gram-image-box button{
+    cursor: pointer;
+    border: none;
+    background-color: transparent;
+    height: 100%;
+}
+
+.gram-image-box button:focus{
+    outline: none;
+    border: none;
+}
+
+.gram-image-box img{
+    width: 100%;
+    height: 100%
+}
+
+
+
+/* MODAL GRAM */
+
+.modal-gram-container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: rgba(0,0,0,0.5);
+    width: 100%;
+    height: 100%;
+    z-index: 999;
+}
+
+.modal-gram-img-box{
+    width: 400px;
+    height: 500px;
+}
+
+.modal-gram-img-box img{
+    width: 100%;
+    height: 100%;
+}
