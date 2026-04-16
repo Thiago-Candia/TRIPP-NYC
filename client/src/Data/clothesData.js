@@ -60,7 +60,7 @@ const products = [
     }
     ,
         {
-        id: 8,
+        id: 9,
         name: "SPACE OUT PANT BLACK",
         description: "A nylon sporty twist on Darkstreet. Nylon pants that zip off into shorts and feature removable chains, adjustable ankles, D-rings, and deep pockets.",
         size:[
@@ -71,7 +71,7 @@ const products = [
     }
     ,
         {
-        id: 8,
+        id: 10,
         name: "SPACE OUT PANT BLACK",
         description: "A nylon sporty twist on Darkstreet. Nylon pants that zip off into shorts and feature removable chains, adjustable ankles, D-rings, and deep pockets.",
         size:[
@@ -82,7 +82,7 @@ const products = [
     }
     ,
         {
-        id: 8,
+        id: 11,
         name: "SPACE OUT PANT BLACK",
         description: "A nylon sporty twist on Darkstreet. Nylon pants that zip off into shorts and feature removable chains, adjustable ankles, D-rings, and deep pockets.",
         size:[
@@ -93,7 +93,7 @@ const products = [
     }
     ,
         {
-        id: 8,
+        id: 12,
         name: "SPACE OUT PANT BLACK",
         description: "A nylon sporty twist on Darkstreet. Nylon pants that zip off into shorts and feature removable chains, adjustable ankles, D-rings, and deep pockets.",
         size:[
@@ -104,7 +104,7 @@ const products = [
     }
     ,
         {
-        id: 8,
+        id: 13,
         name: "SPACE OUT PANT BLACK",
         description: "A nylon sporty twist on Darkstreet. Nylon pants that zip off into shorts and feature removable chains, adjustable ankles, D-rings, and deep pockets.",
         size:[
@@ -114,7 +114,7 @@ const products = [
         img: "https://trippnyc.com/cdn/shop/files/NY7121M_BLACK_F_1000x.jpg?v=1700151915",
     },
         {
-        id: 8,
+        id: 14,
         name: "SPACE OUT PANT BLACK",
         description: "A nylon sporty twist on Darkstreet. Nylon pants that zip off into shorts and feature removable chains, adjustable ankles, D-rings, and deep pockets.",
         size:[
@@ -124,7 +124,7 @@ const products = [
         img: "https://trippnyc.com/cdn/shop/files/NY7121M_BLACK_F_1000x.jpg?v=1700151915",
     },
     {
-        id: 8,
+        id: 15,
         name: "SPACE OUT PANT BLACK",
         description: "A nylon sporty twist on Darkstreet. Nylon pants that zip off into shorts and feature removable chains, adjustable ankles, D-rings, and deep pockets.",
         size:[
@@ -134,7 +134,7 @@ const products = [
         img: "https://trippnyc.com/cdn/shop/files/NY7121M_BLACK_F_1000x.jpg?v=1700151915",
     },
     {
-        id: 8,
+        id: 16,
         name: "SPACE OUT PANT BLACK",
         description: "A nylon sporty twist on Darkstreet. Nylon pants that zip off into shorts and feature removable chains, adjustable ankles, D-rings, and deep pockets.",
         size:[
@@ -144,7 +144,7 @@ const products = [
         img: "https://trippnyc.com/cdn/shop/files/NY7121M_BLACK_F_1000x.jpg?v=1700151915",
     },
     {
-        id: 8,
+        id: 17,
         name: "SPACE OUT PANT BLACK",
         description: "A nylon sporty twist on Darkstreet. Nylon pants that zip off into shorts and feature removable chains, adjustable ankles, D-rings, and deep pockets.",
         size:[
@@ -154,7 +154,7 @@ const products = [
         img: "https://trippnyc.com/cdn/shop/files/NY7121M_BLACK_F_1000x.jpg?v=1700151915",
     },
     {
-        id: 8,
+        id: 18,
         name: "SPACE OUT PANT BLACK",
         description: "A nylon sporty twist on Darkstreet. Nylon pants that zip off into shorts and feature removable chains, adjustable ankles, D-rings, and deep pockets.",
         size:[
@@ -164,7 +164,7 @@ const products = [
         img: "https://trippnyc.com/cdn/shop/files/NY7121M_BLACK_F_1000x.jpg?v=1700151915",
     },
     {
-        id: 8,
+        id: 19,
         name: "SPACE OUT PANT BLACK",
         description: "A nylon sporty twist on Darkstreet. Nylon pants that zip off into shorts and feature removable chains, adjustable ankles, D-rings, and deep pockets.",
         size:[
@@ -174,7 +174,7 @@ const products = [
         img: "https://trippnyc.com/cdn/shop/files/NY7121M_BLACK_F_1000x.jpg?v=1700151915",
     },
     {
-        id: 8,
+        id: 20,
         name: "SPACE OUT PANT BLACK",
         description: "A nylon sporty twist on Darkstreet. Nylon pants that zip off into shorts and feature removable chains, adjustable ankles, D-rings, and deep pockets.",
         size:[
@@ -184,7 +184,7 @@ const products = [
         img: "https://trippnyc.com/cdn/shop/files/NY7121M_BLACK_F_1000x.jpg?v=1700151915",
     },
     {
-        id: 8,
+        id: 21,
         name: "SPACE OUT PANT BLACK",
         description: "A nylon sporty twist on Darkstreet. Nylon pants that zip off into shorts and feature removable chains, adjustable ankles, D-rings, and deep pockets.",
         size:[
@@ -194,7 +194,7 @@ const products = [
         img: "https://trippnyc.com/cdn/shop/files/NY7121M_BLACK_F_1000x.jpg?v=1700151915",
     },
     {
-        id: 8,
+        id: 22,
         name: "SPACE OUT PANT BLACK",
         description: "A nylon sporty twist on Darkstreet. Nylon pants that zip off into shorts and feature removable chains, adjustable ankles, D-rings, and deep pockets.",
         size:[
@@ -204,7 +204,7 @@ const products = [
         img: "https://trippnyc.com/cdn/shop/files/NY7121M_BLACK_F_1000x.jpg?v=1700151915",
     },
     {
-        id: 8,
+        id: 23,
         name: "SPACE OUT PANT BLACK",
         description: "A nylon sporty twist on Darkstreet. Nylon pants that zip off into shorts and feature removable chains, adjustable ankles, D-rings, and deep pockets.",
         size:[
@@ -214,7 +214,7 @@ const products = [
         img: "https://trippnyc.com/cdn/shop/files/NY7121M_BLACK_F_1000x.jpg?v=1700151915",
     },
     {
-        id: 8,
+        id: 24,
         name: "SPACE OUT PANT BLACK",
         description: "A nylon sporty twist on Darkstreet. Nylon pants that zip off into shorts and feature removable chains, adjustable ankles, D-rings, and deep pockets.",
         size:[
@@ -224,7 +224,7 @@ const products = [
         img: "https://trippnyc.com/cdn/shop/files/NY7121M_BLACK_F_1000x.jpg?v=1700151915",
     },
     {
-        id: 8,
+        id: 25,
         name: "SPACE OUT PANT BLACK",
         description: "A nylon sporty twist on Darkstreet. Nylon pants that zip off into shorts and feature removable chains, adjustable ankles, D-rings, and deep pockets.",
         size:[
@@ -234,7 +234,7 @@ const products = [
         img: "https://trippnyc.com/cdn/shop/files/NY7121M_BLACK_F_1000x.jpg?v=1700151915",
     },
     {
-        id: 8,
+        id: 26,
         name: "SPACE OUT PANT BLACK",
         description: "A nylon sporty twist on Darkstreet. Nylon pants that zip off into shorts and feature removable chains, adjustable ankles, D-rings, and deep pockets.",
         size:[
@@ -244,7 +244,7 @@ const products = [
         img: "https://trippnyc.com/cdn/shop/files/NY7121M_BLACK_F_1000x.jpg?v=1700151915",
     },
     {
-        id: 8,
+        id: 27,
         name: "SPACE OUT PANT BLACK",
         description: "A nylon sporty twist on Darkstreet. Nylon pants that zip off into shorts and feature removable chains, adjustable ankles, D-rings, and deep pockets.",
         size:[
@@ -254,7 +254,7 @@ const products = [
         img: "https://trippnyc.com/cdn/shop/files/NY7121M_BLACK_F_1000x.jpg?v=1700151915",
     },
     {
-        id: 8,
+        id: 28,
         name: "SPACE OUT PANT BLACK",
         description: "A nylon sporty twist on Darkstreet. Nylon pants that zip off into shorts and feature removable chains, adjustable ankles, D-rings, and deep pockets.",
         size:[

@@ -22,19 +22,19 @@ const ModalGram = ({isOpen, closeModal, imgSrc}) => {
 
 
     return (
-    <div className='modal-gram-container'>
-        <div className='modal-gram-img-box'>
+    <div className='modal-gram'>
+        <div className='modal-gram__image-box'>
             <img src={imgSrc} alt="" />
         </div>
         <div>wwww
-            <div className='modal-gram-item'>
+            <div className='modal-gram__item'>
                 <span>Hola</span>
             </div>
-            <div className='modal-gram-item'>
+            <div className='modal-gram__item'>
             </div>
-            <div className='modal-gram-item'>
+            <div className='modal-gram__item'>
             </div>
-            <div className='modal-gram-item'>
+            <div className='modal-gram__item'>
             </div>
         </div>
     </div>

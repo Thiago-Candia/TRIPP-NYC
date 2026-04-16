@@ -1,62 +1,88 @@
 
-.gram-section{
+/* GRAM SECTION BLOCK */
+
+.gram-section {
     display: flex;
     flex-direction: column;
     justify-content: center;
     margin-top: 40px;
+    width: 100%;
 }
 
-.gram-section h2{
+.gram-section__title {
     margin-left: 50px;
     margin-bottom: 20px;
+    font-size: 24px;
+    font-weight: 600;
+    color: #000;
 }
 
-.gram-images-container{
+.gram-section__container {
     display: flex;
     flex-direction: row;
     justify-content: center;
+    gap: 15px;
+    padding: 0 20px;
+    flex-wrap: wrap;
 }
 
-.gram-image-box button{
+.gram-section__image-box {
+    position: relative;
+    overflow: hidden;
+    border-radius: 4px;
+}
+
+.gram-section__image-btn {
     cursor: pointer;
     border: none;
     background-color: transparent;
     height: 100%;
+    width: 100%;
+    padding: 0;
+    transition: transform 0.3s ease;
 }
 
-.gram-image-box button:focus{
+.gram-section__image-btn:hover {
+    transform: scale(1.02);
+}
+
+.gram-section__image-btn:focus {
     outline: none;
     border: none;
 }
 
-.gram-image-box img{
+.gram-section__image {
+    display: block;
     width: 100%;
-    height: 100%
+    height: 100%;
+    object-fit: cover;
 }
 
+/* MODAL GRAM BLOCK */
 
-
-/* MODAL GRAM */
-
-.modal-gram-container{
+.modal-gram {
     display: flex;
     justify-content: center;
     align-items: center;
     position: fixed;
     top: 0;
     left: 0;
-    background: rgba(0,0,0,0.5);
     width: 100%;
     height: 100%;
+    background: rgba(0, 0, 0, 0.5);
     z-index: 999;
 }
 
-.modal-gram-img-box{
+.modal-gram__image-box {
     width: 400px;
     height: 500px;
+    border-radius: 8px;
+    overflow: hidden;
 }
 
-.modal-gram-img-box img{
+.modal-gram__image-box img {
+    display: block;
     width: 100%;
     height: 100%;
+    object-fit: cover;
 }

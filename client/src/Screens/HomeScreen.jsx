@@ -42,7 +42,7 @@ const HomeScreen = () => {
         <div>
             <div
                 ref={headerContainerRef}
-                className={`section__header__nav ${show ? 'section__header__nav--visible' : 'section__header__nav-hidden'}`}>
+                className={`section-header-nav ${show ? 'section-header-nav--visible' : 'section-header-nav--hidden'}`}>
                     {showHeader && (
                     <Header
                         isSearchOpen={isSearch}
@@ -62,7 +62,7 @@ const HomeScreen = () => {
             }/>
             </div>
 
-            <div className={`'main__container__home' ${show ? 'main__container--visible' : 'main__container--visible'}`}
+            <div className={`main-container-home ${show ? 'main-container-home--visible' : 'main-container-home--hidden'}`}
                 style={{
                     marginTop: show ? '150px' : '0',
                     transition: 'margin-top 0.3s ease-in-out'

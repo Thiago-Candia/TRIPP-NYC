@@ -58,7 +58,7 @@ const Nav = ({onSearchClick}) => {
                             <button className='btn-config btn__nav'>
                                 <div className='link__nav__box'>
                                     <Link href="/"> 
-                                        <span className='text'>men</span> 
+                                        <span className='text btn__nav__text'>men</span> 
                                     </Link>
                                     <ul className='sublinks__nav__box'>
                                         <li className='sublinks__box'>
@@ -96,7 +96,7 @@ const Nav = ({onSearchClick}) => {
                             <button className='btn-config btn__nav'>
                                 <div className='link__nav__box'>
                                     <Link href="/"> 
-                                        <span className='text nav__btn__text'>darkstreet</span> 
+                                        <span className='text btn__nav__text'>darkstreet</span> 
                                     </Link>
                                     <ul className='sublinks__nav__box'>
                                         <li className='sublinks__box'>
@@ -130,7 +130,7 @@ const Nav = ({onSearchClick}) => {
                         <li>
                             <button className='btn-config btn__nav'>
                                 <a href="/"> 
-                                    <span className='text'>sale</span>
+                                    <span className='text btn__nav__text'>sale</span>
                                 </a>
                             </button>
                         </li>
