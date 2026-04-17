@@ -260,7 +260,7 @@ const products = [
         size:[
             "XXS", "XS", "S", "M", "L", "XL", "XXL"
         ],
-        price: 129.99,
+        price: 12.99,
         img: "https://trippnyc.com/cdn/shop/files/NY7121M_BLACK_F_1000x.jpg?v=1700151915",
     }
 ]
