@@ -3,6 +3,7 @@ import "../Styles/styles.css";
 
 const ModalGram = ({ isOpen, closeModal, imgSrc }) => {
 
+
   useEffect(() => {
     const handleEsc = (e) => {
       if (e.key === "Escape") {
