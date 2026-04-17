@@ -1,54 +1,47 @@
-*{
-    box-sizing: border-box;
-    padding: 0;
-    margin: 0;
-    font-family: 'Helvetica Neue', Arial, sans-serif;
-    text-decoration: none;
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  text-decoration: none;
 }
 
 ul {
-    list-style: none;
+  list-style: none;
 }
 
 :root {
-    --product-spacing-xs: 0.5rem;
-    --product-spacing-sm: 1rem;
-    --product-spacing-md: 1.5rem;
-    --product-spacing-lg: 2rem;
-    --product-spacing-xl: 3rem;
-    
+  --product-spacing-xs: 0.5rem;
+  --product-spacing-sm: 1rem;
+  --product-spacing-md: 1.5rem;
+  --product-spacing-lg: 2rem;
+  --product-spacing-xl: 3rem;
 
-    --black: #010101;
-    --bgc-board: #4A154B ;
-    --green-footer: #00FF00;
-    --red: #C60000;
-    --product-color-primary: #000;
-    --product-color-secondary: #fff;
-    --product-color-border: #e5e5e5;
-    --product-color-text: #333;
-    --product-color-text-light: #666;
-    
-    --product-font-size-xs: 0.75rem;
-    --product-font-size-sm: 0.875rem;
-    --product-font-size-base: 1rem;
-    --product-font-size-lg: 1.125rem;
-    --product-font-size-xl: 1.5rem;
-    --product-font-size-2xl: 2rem;
-    --product-font-size-3xl: 2.5rem;
+  --black: #010101;
+  --bgc-board: #4a154b;
+  --green-footer: #00ff00;
+  --red: #c60000;
+  --product-color-primary: #000;
+  --product-color-secondary: #fff;
+  --product-color-border: #e5e5e5;
+  --product-color-text: #333;
+  --product-color-text-light: #666;
+
+  --product-font-size-xs: 0.75rem;
+  --product-font-size-sm: 0.875rem;
+  --product-font-size-base: 1rem;
+  --product-font-size-lg: 1.125rem;
+  --product-font-size-xl: 1.5rem;
+  --product-font-size-2xl: 2rem;
+  --product-font-size-3xl: 2.5rem;
 }
 
-
-.btn-config{
-    border: none;
-    background-color: transparent;
-    cursor: pointer;
+.btn-config {
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
 }
 
-.text{
-    color: #F1F1F1;
+.text {
+  color: #f1f1f1;
 }
-
-
-
-
-
