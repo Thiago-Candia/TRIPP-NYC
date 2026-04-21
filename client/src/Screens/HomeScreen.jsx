@@ -62,10 +62,6 @@ const HomeScreen = () => {
 
       <div
         className={`main-container-home ${show ? "main-container-home--visible" : "main-container-home--hidden"}`}
-        style={{
-          marginTop: show ? "150px" : "0",
-          transition: "margin-top 0.3s ease-in-out",
-        }}
       >
         <MainContainerHome />
       </div>
