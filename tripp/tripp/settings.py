@@ -52,6 +52,8 @@ INSTALLED_APPS = [
     # Locales
     'tripp',
     'users',
+    'cart',
+    
 ]
 
 MIDDLEWARE = [
