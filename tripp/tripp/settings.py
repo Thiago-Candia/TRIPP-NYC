@@ -40,8 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django.contrib.sites',  # allauth
-    # Terceros
+    'django.contrib.sites',
     'rest_framework',
     'rest_framework.authtoken',
     'corsheaders',
@@ -51,9 +50,9 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     # Locales
     'tripp',
+    'products',
     'users',
     'cart',
-    
 ]
 
 MIDDLEWARE = [
@@ -165,6 +164,8 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 
 USE_TZ = True
+
+SITE_ID = 1
 
 
 # Static files (CSS, JavaScript, Images)

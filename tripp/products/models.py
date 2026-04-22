@@ -42,7 +42,6 @@ class Product(models.Model):
         return self.name
 
 
-
 class Category(models.Model):
     name = models.CharField(max_length=100)
     parent = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE, related_name='children')
