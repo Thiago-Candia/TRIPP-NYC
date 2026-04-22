@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
 from .models import Cart, CartItem
-from serializer import CartItemSerializer, CartItem
+from .serializer import CartSerializer, CartItemSerializer, CartItem
 from products.models import Product, ProductVariant
 
 
@@ -23,6 +23,11 @@ class CartView(APIView):
 
   def get(self, request):
     cart = self.get_cart(request)
+    serializer = CartSerializer(cart)
+    return Response(serializer.data)
+  
+  def post(self, request):
+    cart = self.get_cart(request)
     product_id = request.data.get('product_id')
     variant_id = request.data.get('variant_id')
     quantity = int(request.data.get('quantity', 1))
@@ -38,7 +43,6 @@ class CartView(APIView):
       variant_id=variant_id,
       defaults={'quantity': quantity}
     )
-
     if not created:
       item.quantity += quantity
       item.save()
