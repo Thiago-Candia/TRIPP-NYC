@@ -7,11 +7,11 @@ import Footer from "../Components/Footer";
 import GramSection from "../Components/GramSection";
 
 const HomeScreen = () => {
+
   const [isSearch, setIsSearch] = useState(false);
   const [searchText, setSearchText] = useState("");
   const [showHeader, setShowHeader] = useState(true);
 
-    /* FUNCION SCROLL */
     const lastScrollY = useRef(0);
 
     const headerContainerRef = useRef(null);
@@ -60,13 +60,7 @@ const HomeScreen = () => {
         />
       </div>
 
-      <div
-        className={`main-container-home ${show ? "main-container-home--visible" : "main-container-home--hidden"}`}
-        style={{
-          marginTop: show ? "150px" : "0",
-          transition: "margin-top 0.3s ease-in-out",
-        }}
-      >
+      <div className={`main-container-home ${show ? "main-container-home--visible" : "main-container-home--hidden"}`}>
         <MainContainerHome />
       </div>
 
