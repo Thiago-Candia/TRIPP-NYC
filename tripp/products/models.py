@@ -2,56 +2,6 @@ from django.db import models
 from django.core.validators import MinValueValidator
 from django.utils.text import slugify
 
-class Product(models.Model):
-    name = models.CharField(max_length=200)
-    description = models.TextField(blank=True)
-    price = models.DecimalField(
-        max_digits=10, 
-        decimal_places=2,
-        validators=[MinValueValidator(0)]
-    )
-
-    slug = models.SlugField(max_length=255, unique=True, blank=True)
-    sku = models.CharField(max_length=255, unique=True, blank=True)
-
-    stock = models.BooleanField(default=0, validators=[MinValueValidator(0)])
-
-    compare_at_price = models.DecimalField(
-        max_digits=10,
-        decimal_places=2,
-        null=True,
-        blank=True,
-        help_text='Precio antes del descuento'
-    )
-
-    is_active = models.BooleanField(default=True)
-    is_featured = models.BooleanField(default=False)
-
-    image = models.ImageField(upload_to='products/', null=True, blank=True) 
-
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta():
-        ordering = ['-created_at']
-
-    def __str__(self):
-        return self.name
-    
-    def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = slugify(self.name)
-        super().save(*args, **kwargs)
-
-    @property
-    def is_on_sale(self):
-        return self.compare_at_price and self.compare_at_price > self.price
-    
-    @property
-    def is_in_stock(self):
-        return self.stock > 0
-
-
 class Category(models.Model):
     name = models.CharField(max_length=100)
     slug = models.SlugField(
@@ -83,3 +33,150 @@ class Category(models.Model):
         if not self.slug:
             self.slug = slugify(self.name)
         super().save(*args, **kwargs)
+
+
+
+class Product(models.Model):
+    name = models.CharField(max_length=200)
+    description = models.TextField(blank=True)
+    price = models.DecimalField(
+        max_digits=10, 
+        decimal_places=2,
+        validators=[MinValueValidator(0)]
+    )
+
+
+    category = models.ForeignKey(
+        Category, 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        blank=True,
+        related_name='pruducts'
+    )
+
+    slug = models.SlugField(max_length=255, unique=True, blank=True)
+    sku = models.CharField(max_length=255, unique=True, blank=True)
+
+    stock = models.IntegerField(default=0, validators=[MinValueValidator(0)])
+
+    compare_at_price = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        help_text='Precio antes del descuento'
+    )
+
+    is_active = models.BooleanField(default=True)
+    is_featured = models.BooleanField(default=False)
+
+    image = models.ImageField(upload_to='products/', null=True, blank=True) 
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta():
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return self.name
+
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
+
+    @property
+    def is_on_sale(self):
+        return self.compare_at_price and self.compare_at_price > self.price
+    
+    @property
+    def is_in_stock(self):
+        return self.stock > 0
+    
+    @property
+    def discount_percentage(self):
+        if not self.is_on_sale:
+            return 0
+        return round((self.compare_at_price - self.price) / self.compare_at_price * 100)
+
+
+
+class ProductVariant(models.Model):
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.CASCADE,
+        related_name='variants'
+    )
+
+    size_choices = [
+        ('XXS', 'XX-Small'),
+        ('XS', 'X-Small'),
+        ('S', 'Small'),
+        ('M', 'Medium'),
+        ('L', 'Large'),
+        ('XL', 'X-Large'),
+        ('XXL', 'XX-Large'),
+        ('XXXL', 'XXX-Large'),
+    ]
+
+    size = models.CharField(
+        max_length=10, 
+        choices=size_choices, 
+        blank=True
+    )
+
+    color = models.CharField(max_length=50, blank=True)
+    color_code = models.CharField(
+        max_length=7, 
+        blank=True,
+        help_text='Hex code: #000000'
+    )
+
+    sku = models.CharField(max_length=50, unique=True)
+
+    price_adjustment = models.DecimalField(
+        max_digits=10, 
+        decimal_places=2,
+        default=0,
+        help_text='Agregar/restar al precio base (+/- $10)'
+    )
+    stock = models.IntegerField(default=0, validators=[MinValueValidator(0)])
+
+    image = models.ImageField(upload_to='products/', null=True, blank=True) 
+
+    is_active = models.BooleanField(default=True)
+    is_featured = models.BooleanField(default=False)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ['product', 'size', 'color']
+        ordering = ['size', 'color']
+
+    def __str__(self):
+        parts = [self.product.name]
+        if self.color:
+            parts.append(self.color)
+        if self.size:
+            parts.append(self.size)
+        return ' - '.join(parts)
+    
+    @property
+    def final_price(self):
+        return self.product.price + self.price_adjustment
+    
+    @property
+    def is_in_stock(self):
+        return self.stock > 0
+
+
+
+class ProductImage(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(upload_to='products/gallery/%Y/%m/')
+    alt_text = models.CharField(max_length=255, blank=True)
+    is_primary = models.BooleanField(default=False)
+    order = models.IntegerField(default=0)
