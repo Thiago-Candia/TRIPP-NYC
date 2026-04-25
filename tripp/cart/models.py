@@ -79,8 +79,3 @@ class CartItem(models.Model):
   def subtotal(self):
     price = self.variant.final_price if self.variant else self.product.price
     return price * self.quantity
-  
-
-
-
-

@@ -35,7 +35,6 @@ class Category(models.Model):
         super().save(*args, **kwargs)
 
 
-
 class Product(models.Model):
     name = models.CharField(max_length=200)
     description = models.TextField(blank=True)
@@ -147,6 +146,10 @@ class ProductVariant(models.Model):
     is_active = models.BooleanField(default=True)
     is_featured = models.BooleanField(default=False)
 
+ 
+class Category(models.Model):
+    name = models.CharField(max_length=100)
+    parent = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE, related_name='children')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
