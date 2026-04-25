@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
 from .models import Cart, CartItem
-from serializer import CartItemSerializer, CartItem
+from .serializer import CartItemSerializer, CartItem
 from products.models import Product, ProductVariant
 
 

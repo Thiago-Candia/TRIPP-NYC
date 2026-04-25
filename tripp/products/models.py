@@ -70,8 +70,6 @@ class Product(models.Model):
     is_active = models.BooleanField(default=True)
     is_featured = models.BooleanField(default=False)
 
-    image = models.ImageField(upload_to='products/', null=True, blank=True) 
-
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -168,6 +166,10 @@ class ProductVariant(models.Model):
     def final_price(self):
         return self.product.price + self.price_adjustment
     
+    @property 
+    def primary_image(self):
+        return self.image.filter(is_primary=True).first()
+    
     @property
     def is_in_stock(self):
         return self.stock > 0
@@ -175,8 +177,48 @@ class ProductVariant(models.Model):
 
 
 class ProductImage(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
+    product = models.ForeignKey(
+        Product, 
+        on_delete=models.CASCADE, 
+        related_name='images'
+    )
+
     image = models.ImageField(upload_to='products/gallery/%Y/%m/')
-    alt_text = models.CharField(max_length=255, blank=True)
-    is_primary = models.BooleanField(default=False)
-    order = models.IntegerField(default=0)
+
+    alt_text = models.CharField(
+        max_length=255, 
+        blank=True,
+        help_text='Texto Imagen'
+    )
+    is_primary = models.BooleanField(
+        default=False,
+        help_text='Imagen principal del producto'
+    )
+    
+    order = models.IntegerField(
+        default=0,
+        help_text='Orden de visualización'
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ['-is_primary', 'order']
+        verbose_name = 'Product Image'
+        verbose_name_plural = 'Product Images'
+    
+    def __str__(self):
+        return f"{self.product.name} - Image {self.order}"
+    
+    def save(self, *args, **kwargs):
+        # Si es la primera imagen, hacerla primaria automáticamente
+        if not ProductImage.objects.filter(product=self.product).exists():
+            self.is_primary = True
+        
+        # Si se marca como primaria, quitar primario de las demás
+        if self.is_primary:
+            ProductImage.objects.filter(
+                product=self.product,
+                is_primary=True
+            ).exclude(pk=self.pk).update(is_primary=False)
+        
+        super().save(*args, **kwargs)
