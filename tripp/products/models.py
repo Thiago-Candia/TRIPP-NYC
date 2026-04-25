@@ -146,37 +146,6 @@ class ProductVariant(models.Model):
     is_active = models.BooleanField(default=True)
     is_featured = models.BooleanField(default=False)
 
- 
-class Category(models.Model):
-    name = models.CharField(max_length=100)
-    parent = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE, related_name='children')
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        unique_together = ['product', 'size', 'color']
-        ordering = ['size', 'color']
-
-    def __str__(self):
-        parts = [self.product.name]
-        if self.color:
-            parts.append(self.color)
-        if self.size:
-            parts.append(self.size)
-        return ' - '.join(parts)
-    
-    @property
-    def final_price(self):
-        return self.product.price + self.price_adjustment
-    
-    @property 
-    def primary_image(self):
-        return self.image.filter(is_primary=True).first()
-    
-    @property
-    def is_in_stock(self):
-        return self.stock > 0
-
 
 
 class ProductImage(models.Model):
