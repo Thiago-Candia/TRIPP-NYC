@@ -16,9 +16,9 @@ class ProductVariantInline(admin.TabularInline):
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ['name', 'parent', 'is_active', 'created_at']
+    list_display = ['name', 'parent', 'created_at']
     prepopulated_fields = {'slug': ('name',)}
-    list_filter = ['is_active', 'parent']
+    list_filter = ['parent']
     search_fields = ['name']
 
 
@@ -29,7 +29,6 @@ class ProductAdmin(admin.ModelAdmin):
     search_fields = ['name', 'sku', 'description']
     prepopulated_fields = {'slug': ('name',)}
     
-    # ✅ AGREGADOS: Ambos inlines
     inlines = [ProductImageInline, ProductVariantInline]
     
     fieldsets = (
@@ -42,13 +41,12 @@ class ProductAdmin(admin.ModelAdmin):
         ('Inventory', {
             'fields': ('stock', 'is_active', 'is_featured')
         }),
-        # ✅ REMOVIDO: Sección Media (ya no hay campo image)
     )
 
 
 @admin.register(ProductVariant)
 class ProductVariantAdmin(admin.ModelAdmin):
-    list_display = ['__str__', 'product', 'size', 'color', 'sku', 'final_price', 'stock', 'is_active']
+    list_display = ['product', 'size', 'color', 'sku', 'stock', 'is_active']
     list_filter = ['is_active', 'size', 'color']
     search_fields = ['product__name', 'sku', 'color']
 

@@ -50,7 +50,7 @@ class Product(models.Model):
         on_delete=models.SET_NULL, 
         null=True, 
         blank=True,
-        related_name='pruducts'
+        related_name='products'
     )
 
     slug = models.SlugField(max_length=255, unique=True, blank=True)
@@ -145,6 +145,14 @@ class ProductVariant(models.Model):
 
     is_active = models.BooleanField(default=True)
     is_featured = models.BooleanField(default=False)
+
+    @property
+    def final_price(self):
+        return self.product.price + self.price_adjustment
+    
+
+    def __str__(self):
+        return f"{self.product.name} - {self.size} - {self.color}"
 
 
 
