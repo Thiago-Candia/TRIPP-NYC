@@ -44,6 +44,12 @@ class ProductSerializer(serializers.ModelSerializer):
     fields = '__all__'
     read_only_fields = ['id', 'created_at', 'updated_at']
 
+  def get_is_on_sale(self, obj):
+    return obj.is_on_sale
+
+  def get_discount_porcentage(self, obj):
+    return obj.discount_percentage
+
   def get_primary_image(self, obj):
     primary = obj.images.filter(is_primary=True).first()
     if primary and primary.image:
