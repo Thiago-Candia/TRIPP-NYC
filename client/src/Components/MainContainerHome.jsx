@@ -45,7 +45,7 @@ const MainContainerHome = () => {
       <div className="products__list">
         {products.map((product) => (
           <div key={product.id} className="product-card">
-            <Link to={"/collections/product/" + product.slug}>
+            <Link to={"/collections/product/" + product.id}>
               <div className="product-card__image-box">
                 <img
                   className="product-card__image"
