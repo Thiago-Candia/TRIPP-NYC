@@ -34,7 +34,7 @@ class ProductSerializer(serializers.ModelSerializer):
   category_name = serializers.CharField(source='category.name', read_only=True)
   is_on_sale = serializers.SerializerMethodField(read_only=True)
   is_in_stock = serializers.BooleanField(read_only=True)
-  discount_porcentage = serializers.SerializerMethodField(read_only=True)
+  discount_percentage = serializers.SerializerMethodField(read_only=True)
   images = ProductImageSerializer(many=True, read_only=True)
   variants = ProductVariantSerializer(many=True, read_only=True)
   primary_image = serializers.SerializerMethodField()
@@ -43,6 +43,12 @@ class ProductSerializer(serializers.ModelSerializer):
     model = Product
     fields = '__all__'
     read_only_fields = ['id', 'created_at', 'updated_at']
+
+  def get_is_on_sale(self, obj):
+    return obj.is_on_sale
+
+  def get_discount_percentage(self, obj):
+    return obj.discount_percentage
 
   def get_primary_image(self, obj):
     primary = obj.images.filter(is_primary=True).first()

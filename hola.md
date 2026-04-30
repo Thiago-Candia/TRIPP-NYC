@@ -23,7 +23,11 @@ Models:
 
 Category (categorías jerárquicas)
 Brand (marcas)
+
 Product (productos)
+slug: URL amigable (/products/space-pant-black)
+sku: Código único del producto
+
 ProductVariant (tallas, colores)
 ProductImage (imágenes múltiples)
 ProductReview (reseñas)

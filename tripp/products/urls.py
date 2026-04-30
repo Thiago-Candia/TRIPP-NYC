@@ -5,7 +5,7 @@ from .views import ProductViewSet
 
 router = DefaultRouter()
 
-router.register('products', ProductViewSet, basename='products')
+router.register('', ProductViewSet, basename='products')
 
 app_name = 'products'
 

@@ -35,7 +35,7 @@ class CartView(APIView):
 
     try:
       product = Product.objects.get(id=product_id)
-    except Product.DoesNoExist:
+    except Product.DoesNotExist:
       return Response({'error': 'Product not found'}, status=status.HTTP_404_NOT_FOUND)
   
     item, created = CartItem.objects.get_or_create(
@@ -47,7 +47,7 @@ class CartView(APIView):
     if not created:
       item.quantity += quantity
       item.save()
-      return Response(CartItemSerializer(cart).data , status=status.HTTP_200_OK)
+    return Response(CartSerializer(cart).data, status=status.HTTP_201_CREATED)
 
   def delete(self, request):
     cart = self.get_cart(request)

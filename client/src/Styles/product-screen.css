@@ -1,36 +1,27 @@
-/* =====================================================
-   PRODUCT SCREEN - METODOLOGÍA BEM
-   Unidades: rem/em (no px)
-   ===================================================== */
 
-/* Variables de diseño */
-
-/* ===================================================== */
-/* PRODUCT SCREEN - Container principal */
-/* ===================================================== */
 
 .product-screen {
   width: 100%;
   min-height: 100vh;
   background-color: var(--product-color-secondary);
+  flex: 1;
 }
 
-/* ===================================================== */
-/* PRODUCT - Layout principal */
-/* ===================================================== */
+
+/* PRODUCT */
+
 
 .product {
   display: flex;
   flex-direction: row;
   max-width: 90rem; /* 1440px */
   margin: 0 auto;
-
   gap: var(--product-spacing-xl);
 }
 
-/* ===================================================== */
-/* PRODUCT__GALLERY - Galería de imágenes */
-/* ===================================================== */
+
+/* PRODUCT__GALLERY */
+
 
 .product__gallery {
   position: relative;
@@ -104,9 +95,9 @@
   color: var(--product-color-secondary);
 }
 
-/* ===================================================== */
-/* PRODUCT__INFO - Información del producto */
-/* ===================================================== */
+
+/* PRODUCT__INFO */
+
 
 .product__info {
   flex: 1;
@@ -114,9 +105,9 @@
   max-width: 50%;
 }
 
-/* ===================================================== */
-/* PRODUCT__HEADER - Header con favorito y breadcrumb */
-/* ===================================================== */
+
+/* PRODUCT__HEADER */
+
 
 .product__header {
   display: flex;
@@ -166,9 +157,9 @@
   color: var(--product-color-text-light);
 }
 
-/* ===================================================== */
-/* PRODUCT__TITLE-SECTION - Título y precio */
-/* ===================================================== */
+
+/* PRODUCT__TITLE-SECTION */
+
 
 .product__title-section {
   margin-bottom: var(--product-spacing-lg);
@@ -190,9 +181,8 @@
   color: var(--product-color-text);
 }
 
-/* ===================================================== */
-/* PRODUCT__DIVIDER - Separador */
-/* ===================================================== */
+/* PRODUCT__DIVIDER */
+
 
 .product__divider {
   border: none;
@@ -201,10 +191,7 @@
   margin: var(--product-spacing-lg) 0;
 }
 
-/* ===================================================== */
-/* PRODUCT__SIZE-SECTION - Sección de tallas */
-/* ===================================================== */
-
+/* PRODUCT__SIZE-SECTION  */
 .product__size-section {
   margin-bottom: var(--product-spacing-lg);
 }
@@ -245,9 +232,9 @@
   color: var(--product-color-secondary);
 }
 
-/* ===================================================== */
-/* PRODUCT__ACTIONS - Botones de acción */
-/* ===================================================== */
+
+/* PRODUCT__ACTIONS */
+
 
 .product__actions {
   display: flex;
@@ -306,9 +293,9 @@
   color: var(--product-color-primary);
 }
 
-/* ===================================================== */
-/* PRODUCT__DESCRIPTION - Descripción del producto */
-/* ===================================================== */
+
+/* PRODUCT__DESCRIPTION */
+
 
 .product__description {
   margin-bottom: var(--product-spacing-lg);
@@ -343,9 +330,9 @@
   line-height: 1.6;
 }
 
-/* ===================================================== */
-/* RESPONSIVE - Media Queries */
-/* ===================================================== */
+
+/* RESPONSIVE - */
+
 
 /* Tablet */
 @media (max-width: 64rem) {

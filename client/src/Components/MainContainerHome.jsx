@@ -29,7 +29,7 @@ const MainContainerHome = () => {
       <div className="banner-main">
         <Link to={"/collections"}>
           <img className="banner-main__img" src={intro} alt="" />
-          <img src={intro2} alt="" />
+          <img className="banner-main__img" src={intro2} alt="" />
         </Link>
       </div>
 
@@ -45,7 +45,7 @@ const MainContainerHome = () => {
       <div className="products__list">
         {products.map((product) => (
           <div key={product.id} className="product-card">
-            <Link to={"/collections/product/" + product.slug}>
+            <Link to={"/collections/product/" + product.id}>
               <div className="product-card__image-box">
                 <img
                   className="product-card__image"

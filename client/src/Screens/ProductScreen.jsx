@@ -1,25 +1,51 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Nav } from "../Components";
 import { Link, useParams } from "react-router-dom";
-import products from "../Data/clothesData";
 import Footer from "../Components/Footer";
 import Header from "../Components/Header";
 import "../Styles/product-screen.css";
+import { getProductById } from "../api/products.js";
+import { useCart } from "../Hooks/useCart.jsx";
+
 
 export const ProductScreen = () => {
-    const { id } = useParams();
-    const product = products.find((product) => product.id === parseInt(id));
 
+    const { handleAddToCart } = useCart();
+    const {id} = useParams();
+
+    const [product, setProduct] = useState({});
+    const [selectedVariant, setSelectedVariant] = useState(null);
     const [selectedSize, setSelectedSize] = useState("");
-    const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [isFavorite, setIsFavorite] = useState(false);
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const sizes = product.variants?.map(v => v.size) || [];
+
+    useEffect(() => {
+    const fetchProduct = async () => {
+        try {
+            const data = await getProductById(id)
+            setProduct(data);
+        } catch (error) {
+            console.error("Error fetching product", error);
+        }
+    }
+    fetchProduct()
+    }, [id])
 
     if (!product) {
         return <h1>Product not found</h1>;
     }
 
-    // Simulación de múltiples imágenes (adapta según tu data)
-    const productImages = product.images || [product.img];
+
+    const getImageUrl = (imgPath) => {
+        if (!imgPath) return '';
+        if (imgPath.startsWith('http') || imgPath.startsWith('data:')) return imgPath;
+        return `${window.location.origin}${imgPath.startsWith('/') ? '' : '/'}${imgPath}`;
+    };
+
+    const productImages = product.images?.length > 0
+        ? product.images.map(img => getImageUrl(img.image))
+        : [getImageUrl(product.primary_image)];
 
     const handlePrevImage = () => {
     setCurrentImageIndex((prev) =>
@@ -33,45 +59,31 @@ export const ProductScreen = () => {
     );
     };
 
-    const sizes = [
-        "XX-SMALL",
-        "X-SMALL",
-        "SMALL",
-        "MEDIUM",
-        "LARGE",
-        "X-LARGE",
-        "XX-LARGE",
-        "XXX-LARGE",
-    ];
-
     return (
-    <div className="product-screen">
+    <div className="page">
         <Header />
         <Nav />
-
-        <main className="product">
-        {/* Galería de imágenes */}
+        <main className="product-screen">
+            <div className="product">
             <section className="product__gallery">
                 <button
-                        className="product__gallery-nav product__gallery-nav--prev"
-                        onClick={handlePrevImage}
-                        aria-label="Previous image"
-                    >
+                    className="product__gallery-nav product__gallery-nav--prev"
+                    onClick={handlePrevImage}
+                    aria-label="Previous image"
+                >
                     ‹
                 </button>
-        
-                    <div className="product__gallery-main">
+                <div className="product__gallery-main">
                     <img
                         src={productImages[currentImageIndex]}
                         alt={product.name}
                         className="product__gallery-image"
                     />
                     <button className="product__gallery-view-more">
-                        UNISEX - View more images
+                        {product.variants?.[0]?.size || "UNISEX"} - View more images
                     </button>
                 </div>
-        
-                    <button
+                <button
                     className="product__gallery-nav product__gallery-nav--next"
                     onClick={handleNextImage}
                     aria-label="Next image"
@@ -79,10 +91,7 @@ export const ProductScreen = () => {
                     ›
                 </button>
             </section>
-        
-                {/* Información del producto */}
             <section className="product__info">
-              {/* Header con favorito y breadcrumb */}
                 <div className="product__header">
                     <button
                         className="product__favorite"
@@ -90,115 +99,106 @@ export const ProductScreen = () => {
                         aria-label="Add to favorites"
                     >
                         {isFavorite ? "❤" : "♡"}
-                </button>
-        
+                    </button>
                     <span className="product__sku">
-                    No. {product.sku || "AF3921MB-GNB-XXS"}
-                </span>
-        
-                    <nav className="product__breadcrumb">
-                    <Link to="/" className="product__breadcrumb-link">
-                        Home
-                    </Link>
-                    <span className="product__breadcrumb-separator">
-                        \
+                        No. {product.sku || "N/A"}
                     </span>
-                    <Link to="/collections" className="product__breadcrumb-link">
-                        New Arrivals Homepage
-                    </Link>
-                </nav>
+                    <nav className="product__breadcrumb">
+                        <Link to="/" className="product__breadcrumb-link">
+                            Home
+                        </Link>
+                        <span className="product__breadcrumb-separator">
+                            \
+                        </span>
+                        <Link to="/collections" className="product__breadcrumb-link">
+                            New Arrivals Homepage
+                        </Link>
+                    </nav>
                 </div>
-        
-                    {/* Título y precio */}
                 <div className="product__title-section">
                     <h1 className="product__title">{product.name}</h1>
-                    <p className="product__price">${product.price}</p>
+                    <p className="product__price">${Number(product.price).toFixed(2)}</p>
                 </div>
-        
-                    <hr className="product__divider" />
-        
-                    {/* Selección de talla */}
+                <hr className="product__divider" />
+                
                 <div className="product__size-section">
-                <h2 className="product__size-label">
-                    Size
-                </h2>
-        
+                    <h2 className="product__size-label">
+                        Size
+                    </h2>
                     <div className="product__size-grid">
-                    {sizes.map((size) => (
-                    <button
-                        key={size}
-                        className={`product__size-button ${
-                        selectedSize === size
-                            ? "product__size-button--selected"
-                            : ""
-                        }`}
-                        onClick={() => setSelectedSize(size)}
-                    >
-                        {size}
-                    </button>
-                    ))}
-                </div>
-                
+                        {sizes.length > 0 ? (
+                            sizes.map((size) => (
+                                <button
+                                    key={size}
+                                    className={`product__size-button ${
+                                        selectedSize === size
+                                            ? "product__size-button--selected"
+                                            : ""
+                                    }`}
+                                    onClick={() => setSelectedSize(size)}
+                                >
+                                    {size}
+                                </button>
+                            ))
+                        ) : (
+                            <p>No sizes available</p>
+                        )}
+                    </div>
                     <div className="product__actions">
-                    <button
-                        className="product__action-button product__action-button--primary"
-                        disabled={!selectedSize}
-                    >
-                    Select a size
-                    </button>
-                
+                        <button
+                            className="product__action-button product__action-button--primary"
+                            disabled={!selectedSize}
+                            onClick={() => {
+                                const variant = product.variants?.find(v => v.size === selectedSize);
+                                if (variant) {
+                                    handleAddToCart(product.id, 1, variant.id);
+                                }
+                            }}
+                        >
+                            {selectedSize ? "Add to cart" : "Select a size"}
+                        </button>
                         <button className="product__action-button product__action-button--secondary">
-                        Need Help?
-                    </button>
-                </div>
-                
+                            Need Help?
+                        </button>
+                    </div>
                     <button className="product__size-chart">Size Chart</button>
                 </div>
-                
-                    <hr className="product__divider" />
-                
-                    {/* Descripción del producto */}
+                <hr className="product__divider" />
                 <div className="product__description">
-                <p className="product__description-text">
-                    {product.description ||
-                    "These green slime bleach wash pants zip off into shorts and feature removable chains, adjustable ankles, D-rings, and deep pockets."}
-                </p>
-                    
-                <div     className="product__details">
-                    <p className="product__details-item">
-                        <strong>WOMAN IS WEARING X-SMALL</strong>
+                    <p className="product__description-text">
+                        {product.description ||
+                        "Product description not available."}
                     </p>
-                    <p className="product__details-item">
-                        <strong>MAN IS WEARING MEDIUM</strong>
-                    </p>
-                    <p className="product__details-item">
-                        <strong>SIZING BASED ON MENS FIT</strong>
-                    </p>
-                    
+                    <div className="product__details">
+                        <p className="product__details-item">
+                            <strong>WOMAN IS WEARING X-SMALL</strong>
+                        </p>
+                        <p className="product__details-item">
+                            <strong>MAN IS WEARING MEDIUM</strong>
+                        </p>
+                        <p className="product__details-item">
+                            <strong>SIZING BASED ON MENS FIT</strong>
+                        </p>
                         <ul className="product__features">
-                        <li className="product__features-item">
-                            – Refer to Unisex Darkstreet Pant - Size Chart (Based on Men's
-                            Sizing)
-                        </li>
-                        <li className="product__features-item">
-                            – Drawstring and adjustable waist buckles allow for a tighter
-                            fit on the waist
-                        </li>
-                        <li className="product__features-item">
-                            – 100% Cotton.
-                        </li>
-                        <li className="product__features-item">
-                            - Hand wash cold. Lay flat to dry.
-                        </li>
-                    </ul>
-                </div>
+                            <li className="product__features-item">
+                                – Refer to Size Chart (Based on Men's Sizing)
+                            </li>
+                            <li className="product__features-item">
+                                – Adjustable fit for comfort
+                            </li>
+                            <li className="product__features-item">
+                                – Premium Materials
+                            </li>
+                            <li className="product__features-item">
+                                – Care instructions: See tag for details
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </section>
-        </main>
-
-        <footer>
-            <Footer />
-        </footer>
+        </div>
+    </main>
+    <Footer />
     </div>
     );
 };
