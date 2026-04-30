@@ -4,14 +4,14 @@ import { Link, useParams } from "react-router-dom";
 import Footer from "../Components/Footer";
 import Header from "../Components/Header";
 import "../Styles/product-screen.css";
-import { getProductBySlug} from "../api/products.js";
+import { getProductById } from "../api/products.js";
 import { useCart } from "../Hooks/useCart.jsx";
 
 
 export const ProductScreen = () => {
 
     const { handleAddToCart } = useCart();
-    const {slug} = useParams();
+    const {id} = useParams();
 
     const [product, setProduct] = useState({});
     const [selectedVariant, setSelectedVariant] = useState(null);
@@ -23,27 +23,29 @@ export const ProductScreen = () => {
     useEffect(() => {
     const fetchProduct = async () => {
         try {
-            const data = await getProductBySlug(slug)
+            const data = await getProductById(id)
             setProduct(data);
         } catch (error) {
             console.error("Error fetching product", error);
         }
     }
     fetchProduct()
-    }, [slug])
+    }, [id])
 
     if (!product) {
         return <h1>Product not found</h1>;
     }
 
 
-    const productImages = product.images || [product.img];
+    const getImageUrl = (imgPath) => {
+        if (!imgPath) return '';
+        if (imgPath.startsWith('http') || imgPath.startsWith('data:')) return imgPath;
+        return `${window.location.origin}${imgPath.startsWith('/') ? '' : '/'}${imgPath}`;
+    };
 
-
-    const images = 
-        product.images?.length > 0
-        ? product.images.map(img => img.image)
-        : [product.primary_image];
+    const productImages = product.images?.length > 0
+        ? product.images.map(img => getImageUrl(img.image))
+        : [getImageUrl(product.primary_image)];
 
     const handlePrevImage = () => {
     setCurrentImageIndex((prev) =>
@@ -58,162 +60,145 @@ export const ProductScreen = () => {
     };
 
     return (
-        <div className="product-screen">
-            <Header />
-            <Nav />
-            
-            <main className="product">
-                <section className="product__gallery">
-                    <button
-                        className="product__gallery-nav product__gallery-nav--prev"
-                        onClick={handlePrevImage}
-                        aria-label="Previous image"
-                    >
-                        ‹
+    <div className="page">
+        <Header />
+        <Nav />
+        <main className="product-screen">
+            <div className="product">
+            <section className="product__gallery">
+                <button
+                    className="product__gallery-nav product__gallery-nav--prev"
+                    onClick={handlePrevImage}
+                    aria-label="Previous image"
+                >
+                    ‹
+                </button>
+                <div className="product__gallery-main">
+                    <img
+                        src={productImages[currentImageIndex]}
+                        alt={product.name}
+                        className="product__gallery-image"
+                    />
+                    <button className="product__gallery-view-more">
+                        {product.variants?.[0]?.size || "UNISEX"} - View more images
                     </button>
-
-                    <div className="product__gallery-main">
-                        <img
-                            src={productImages[currentImageIndex]}
-                            alt={product.name}
-                            className="product__gallery-image"
-                        />
-                        <button className="product__gallery-view-more">
-                            {product.variants?.[0]?.size || "UNISEX"} - View more images
-                        </button>
-                    </div>
-
+                </div>
+                <button
+                    className="product__gallery-nav product__gallery-nav--next"
+                    onClick={handleNextImage}
+                    aria-label="Next image"
+                >
+                    ›
+                </button>
+            </section>
+            <section className="product__info">
+                <div className="product__header">
                     <button
-                        className="product__gallery-nav product__gallery-nav--next"
-                        onClick={handleNextImage}
-                        aria-label="Next image"
+                        className="product__favorite"
+                        onClick={() => setIsFavorite(!isFavorite)}
+                        aria-label="Add to favorites"
                     >
-                        ›
+                        {isFavorite ? "❤" : "♡"}
                     </button>
-                </section>
-
-                <section className="product__info">
-                    <div className="product__header">
-                        <button
-                            className="product__favorite"
-                            onClick={() => setIsFavorite(!isFavorite)}
-                            aria-label="Add to favorites"
-                        >
-                            {isFavorite ? "❤" : "♡"}
-                        </button>
-
-                        <span className="product__sku">
-                            No. {product.sku || "N/A"}
+                    <span className="product__sku">
+                        No. {product.sku || "N/A"}
+                    </span>
+                    <nav className="product__breadcrumb">
+                        <Link to="/" className="product__breadcrumb-link">
+                            Home
+                        </Link>
+                        <span className="product__breadcrumb-separator">
+                            \
                         </span>
-
-                        <nav className="product__breadcrumb">
-                            <Link to="/" className="product__breadcrumb-link">
-                                Home
-                            </Link>
-                            <span className="product__breadcrumb-separator">
-                                \
-                            </span>
-                            <Link to="/collections" className="product__breadcrumb-link">
-                                New Arrivals Homepage
-                            </Link>
-                        </nav>
+                        <Link to="/collections" className="product__breadcrumb-link">
+                            New Arrivals Homepage
+                        </Link>
+                    </nav>
+                </div>
+                <div className="product__title-section">
+                    <h1 className="product__title">{product.name}</h1>
+                    <p className="product__price">${Number(product.price).toFixed(2)}</p>
+                </div>
+                <hr className="product__divider" />
+                
+                <div className="product__size-section">
+                    <h2 className="product__size-label">
+                        Size
+                    </h2>
+                    <div className="product__size-grid">
+                        {sizes.length > 0 ? (
+                            sizes.map((size) => (
+                                <button
+                                    key={size}
+                                    className={`product__size-button ${
+                                        selectedSize === size
+                                            ? "product__size-button--selected"
+                                            : ""
+                                    }`}
+                                    onClick={() => setSelectedSize(size)}
+                                >
+                                    {size}
+                                </button>
+                            ))
+                        ) : (
+                            <p>No sizes available</p>
+                        )}
                     </div>
-
-                    <div className="product__title-section">
-                        <h1 className="product__title">{product.name}</h1>
-                        <p className="product__price">${Number(product.price).toFixed(2)}</p>
+                    <div className="product__actions">
+                        <button
+                            className="product__action-button product__action-button--primary"
+                            disabled={!selectedSize}
+                            onClick={() => {
+                                const variant = product.variants?.find(v => v.size === selectedSize);
+                                if (variant) {
+                                    handleAddToCart(product.id, 1, variant.id);
+                                }
+                            }}
+                        >
+                            {selectedSize ? "Add to cart" : "Select a size"}
+                        </button>
+                        <button className="product__action-button product__action-button--secondary">
+                            Need Help?
+                        </button>
                     </div>
-
-                    <hr className="product__divider" />
-                    
-                    <div className="product__size-section">
-                        <h2 className="product__size-label">
-                            Size
-                        </h2>
-
-                        <div className="product__size-grid">
-                            {sizes.length > 0 ? (
-                                sizes.map((size) => (
-                                    <button
-                                        key={size}
-                                        className={`product__size-button ${
-                                            selectedSize === size
-                                                ? "product__size-button--selected"
-                                                : ""
-                                        }`}
-                                        onClick={() => setSelectedSize(size)}
-                                    >
-                                        {size}
-                                    </button>
-                                ))
-                            ) : (
-                                <p>No sizes available</p>
-                            )}
-                        </div>
-
-                        <div className="product__actions">
-                            <button
-                                className="product__action-button product__action-button--primary"
-                                disabled={!selectedSize}
-                                onClick={() => {
-                                    const variant = product.variants?.find(v => v.size === selectedSize);
-                                    if (variant) {
-                                        handleAddToCart(product.id, 1, variant.id);
-                                    }
-                                }}
-                            >
-                                {selectedSize ? "Add to cart" : "Select a size"}
-                            </button>
-
-                            <button className="product__action-button product__action-button--secondary">
-                                Need Help?
-                            </button>
-                        </div>
-
-                        <button className="product__size-chart">Size Chart</button>
-                    </div>
-
-                    <hr className="product__divider" />
-
-                    <div className="product__description">
-                        <p className="product__description-text">
-                            {product.description ||
-                            "Product description not available."}
+                    <button className="product__size-chart">Size Chart</button>
+                </div>
+                <hr className="product__divider" />
+                <div className="product__description">
+                    <p className="product__description-text">
+                        {product.description ||
+                        "Product description not available."}
+                    </p>
+                    <div className="product__details">
+                        <p className="product__details-item">
+                            <strong>WOMAN IS WEARING X-SMALL</strong>
                         </p>
-
-                        <div className="product__details">
-                            <p className="product__details-item">
-                                <strong>WOMAN IS WEARING X-SMALL</strong>
-                            </p>
-                            <p className="product__details-item">
-                                <strong>MAN IS WEARING MEDIUM</strong>
-                            </p>
-                            <p className="product__details-item">
-                                <strong>SIZING BASED ON MENS FIT</strong>
-                            </p>
-
-                            <ul className="product__features">
-                                <li className="product__features-item">
-                                    – Refer to Size Chart (Based on Men's Sizing)
-                                </li>
-                                <li className="product__features-item">
-                                    – Adjustable fit for comfort
-                                </li>
-                                <li className="product__features-item">
-                                    – Premium Materials
-                                </li>
-                                <li className="product__features-item">
-                                    – Care instructions: See tag for details
-                                </li>
-                            </ul>
-                        </div>
+                        <p className="product__details-item">
+                            <strong>MAN IS WEARING MEDIUM</strong>
+                        </p>
+                        <p className="product__details-item">
+                            <strong>SIZING BASED ON MENS FIT</strong>
+                        </p>
+                        <ul className="product__features">
+                            <li className="product__features-item">
+                                – Refer to Size Chart (Based on Men's Sizing)
+                            </li>
+                            <li className="product__features-item">
+                                – Adjustable fit for comfort
+                            </li>
+                            <li className="product__features-item">
+                                – Premium Materials
+                            </li>
+                            <li className="product__features-item">
+                                – Care instructions: See tag for details
+                            </li>
+                        </ul>
                     </div>
-                </section>
-            </main>
-
-            <footer>
-                <Footer />
-            </footer>
+                </div>
+            </section>
         </div>
+    </main>
+    <Footer />
+    </div>
     );
 };

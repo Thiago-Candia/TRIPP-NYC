@@ -29,7 +29,7 @@ const MainContainerHome = () => {
       <div className="banner-main">
         <Link to={"/collections"}>
           <img className="banner-main__img" src={intro} alt="" />
-          <img src={intro2} alt="" />
+          <img className="banner-main__img" src={intro2} alt="" />
         </Link>
       </div>
 

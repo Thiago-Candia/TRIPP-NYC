@@ -6,15 +6,21 @@ const Footer = () => {
       <div className="footer-container__content">
         <p>© 2023 Tripp NYC. All rights reserved.</p>
         <p>Follow us on social media!</p>
-        <ul className="footer-container__social-links">
-          <li>
-            <a href="https://www.instagram.com/trippnyc/">Instagram</a>
+        <ul className="footer__container__social__links">
+          <li className="footer__container__link">
+            <a className="footer__link" href="https://www.instagram.com/trippnyc/">
+              Instagram
+            </a>
           </li>
-          <li>
-            <a href="https://www.facebook.com/trippnyc">Facebook</a>
+          <li className="footer__container__link"> 
+            <a className="footer__link" href="https://www.facebook.com/trippnyc">
+              Facebook
+            </a>
           </li>
-          <li>
-            <a href="https://twitter.com/trippnyc">Twitter</a>
+          <li className="footer__container__link">
+            <a className="footer__link" href="https://twitter.com/trippnyc">
+              Twitter
+            </a>
           </li>
         </ul>
       </div>

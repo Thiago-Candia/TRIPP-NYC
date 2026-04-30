@@ -160,8 +160,7 @@ REST_FRAMEWORK = {
 
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
-
+MEDIA_ROOT = BASE_DIR / 'media' / 'staticfiles'
 
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/

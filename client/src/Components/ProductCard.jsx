@@ -1,8 +1,12 @@
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { useCart } from '../Hooks/useCart';
 
 function ProductCard({product}) {
+
+
+  const params = useParams()
+  const imageUrl = `${router.baseURL}/${product.primary_image}`
 
   const { handleAddToCart } = useCart();
   const [isFavorite, setIsFavorite] = useState(false);
@@ -13,9 +17,9 @@ function ProductCard({product}) {
   return (
     <div className="product-card">
       <div className="product-card__image-wrapper">
-        <Link to={`/collections/product/${product.slug || product.id}`}>
+        <Link to={`/collections/product/${product.id}`}>
           <img 
-            src={product.primary_image} 
+            src={imageUrl} 
             alt={product.name} 
             className="product-card__image"
           />
@@ -31,7 +35,7 @@ function ProductCard({product}) {
       </div>
 
       <div className="product-card__info">
-        <Link to={`/collections/product/${product.slug || product.id}`}>
+        <Link to={`/collections/product/${product.id}`}>
           <h3 className="product-card__name">{product.name}</h3>
         </Link>
 
@@ -61,7 +65,8 @@ function ProductCard({product}) {
               if (variant) {
                 handleAddToCart(product.id, 1, variant.id);
               }
-            } else {
+            } 
+            else {
               handleAddToCart(product.id, 1);
             }
           }}
