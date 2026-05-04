@@ -63,9 +63,9 @@ function ProductCard({product}) {
             if (selectedSize && product.variants) {
               const variant = product.variants.find(v => v.size === selectedSize);
               if (variant) {
-                handleAddToCart(product.id, 1, variant.id);
+                handleAddToCart(product, 1, variant);
               }
-            } 
+            }
             else {
               handleAddToCart(product.id, 1);
             }
@@ -79,8 +79,3 @@ function ProductCard({product}) {
 }
 
 export default ProductCard
-
-
-
-
-

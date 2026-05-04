@@ -151,7 +151,7 @@ export const ProductScreen = () => {
                             onClick={() => {
                                 const variant = product.variants?.find(v => v.size === selectedSize);
                                 if (variant) {
-                                    handleAddToCart(product.id, 1, variant.id);
+                                    handleAddToCart(product, 1, variant);
                                 }
                             }}
                         >
@@ -200,5 +200,5 @@ export const ProductScreen = () => {
     </main>
     <Footer />
     </div>
-    );
-};
+    )
+}

@@ -1,27 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import "../Styles/styles.css";
 import CollectionScreen from "../Screens/CollectionScreen.jsx";
 import { Link } from "react-router-dom";
 import intro from "../assets/Img/intro.jpg";
 import intro2 from "../assets/Img/intro2.jpg";
-import { getProducts } from "../api/products.js";
+import { useProductContext } from "../Context/ProductContext.jsx";
 
 const MainContainerHome = () => {
 
-  const [products, setProducts] = useState([]);
-
-  useEffect(() => {
-  const fetchData = async () => {
-    try {
-      const data = await getProducts();
-      setProducts(data.results);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  fetchData();
-}, []);
+  const {products} = useProductContext()
 
 
   return (

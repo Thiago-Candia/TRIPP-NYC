@@ -1,11 +1,19 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Nav } from "../Components";
 import "../Styles/styles.css";
 import products from "../Data/clothesData.js";
 import { Link } from "react-router-dom";
 import Footer from "../Components/Footer.jsx";
+import { getProducts } from "../api/products.js";
+import { useProductContext } from "../Context/ProductContext.jsx";
+
+
 
 const CollectionScreen = () => {
+
+    const { products } = useProductContext()
+
+
     return (
     <div className="collection">
         <main className="collection__main">
@@ -34,25 +42,22 @@ const CollectionScreen = () => {
                 <div className="product-card__image-box">
                     <img
                         className="product-card__image"
-                        src={product.img}
+                        src={product.primary_image}
                         alt={product.name}
                     />
                 </div>
                 <div className="product-card__details">
-                    <h3 className="text">{product.name}</h3>
-                    <p className="text">${product.price.toFixed(2)}</p>
+                    <h3>{product.name}</h3>
+                    <p>${Number(product.price).toFixed(2)}</p>
                 </div>
                 </Link>
             </div>
             ))}
         </div>
         </main>
-
-        <Footer>
-            <Footer />
-        </Footer>
+        <Footer />
     </div>
-    );
+        )
 };
 
 export default CollectionScreen;
