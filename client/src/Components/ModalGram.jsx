@@ -2,17 +2,17 @@ import React, { useEffect } from "react";
 import "../Styles/styles.css";
 
 const ModalGram = ({ isOpen, closeModal, imgSrc }) => {
-
-
   useEffect(() => {
-    const handleEsc = (e) => {
-      if (e.key === "Escape") {
+    const handleEsc = (event) => {
+      if (event.key === "Escape") {
         closeModal();
       }
     };
+
     if (isOpen) {
       window.addEventListener("keydown", handleEsc);
     }
+
     return () => {
       window.removeEventListener("keydown", handleEsc);
     };
@@ -21,18 +21,12 @@ const ModalGram = ({ isOpen, closeModal, imgSrc }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="modal-gram">
+    <div className="modal-gram" role="dialog" aria-modal="true">
+      <button className="modal-gram__close" onClick={closeModal}>
+        Close
+      </button>
       <div className="modal-gram__image-box">
-        <img src={imgSrc} alt="" />
-      </div>
-      <div>
-        wwww
-        <div className="modal-gram__item">
-          <span>Hola</span>
-        </div>
-        <div className="modal-gram__item"></div>
-        <div className="modal-gram__item"></div>
-        <div className="modal-gram__item"></div>
+        <img src={imgSrc} alt="Instagram post preview" />
       </div>
     </div>
   );

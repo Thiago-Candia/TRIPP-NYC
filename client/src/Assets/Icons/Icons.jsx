@@ -5,7 +5,6 @@ import { SlOptions } from "react-icons/sl";
 import { IoIosSearch } from "react-icons/io";
 import { PiNumpad } from "react-icons/pi";
 import { MdOutlineKeyboardArrowDown } from "react-icons/md";
-import { PiChatTeardropTextFill } from "react-icons/pi";
 import { BsCameraVideo } from "react-icons/bs";
 import { RiContactsBook2Line } from "react-icons/ri";
 import { IoNotificationsOutline } from "react-icons/io5";
@@ -27,7 +26,6 @@ export const Icons = {
     BookContact: RiContactsBook2Line,
     Notification: IoNotificationsOutline,
     VideoCamera: BsCameraVideo,
-    ChatGlobe: IoNotificationsOutline,
     MagnifyingGlass: IoIosSearch,
     Numpad: PiNumpad,
     Arrowdown: MdOutlineKeyboardArrowDown,

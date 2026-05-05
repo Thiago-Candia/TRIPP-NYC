@@ -2,11 +2,9 @@ import React from "react";
 
 const Header = ({
   isSearchOpen,
-  searchText,
-  setSearchText,
-  handleSearchClick,
-  handleCloseSearch,
-  onCloseHeader,
+  searchText = "",
+  setSearchText = () => {},
+  onCloseHeader = () => {},
 }) => {
   return (
     <div className="header__banner">

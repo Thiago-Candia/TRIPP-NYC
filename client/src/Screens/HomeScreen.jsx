@@ -12,8 +12,6 @@ const HomeScreen = () => {
   const [searchText, setSearchText] = useState("");
   const [showHeader, setShowHeader] = useState(true);
 
-    const lastScrollY = useRef(0);
-
     const headerContainerRef = useRef(null);
     const [show, setShow] = useState(true);
 

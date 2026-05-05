@@ -1,58 +1,114 @@
-import React from "react";
-import { Nav } from "../Components";
+import React, { useEffect, useMemo, useState } from "react";
 import "../Styles/styles.css";
-import products from "../Data/clothesData.js";
 import { Link } from "react-router-dom";
 import Footer from "../Components/Footer.jsx";
+import CollectionFilters from "../Components/CollectionFilters.jsx";
+import CollectionToolbar from "../Components/CollectionToolbar.jsx";
+import ProductGrid from "../Components/ProductGrid.jsx";
+import { useProductContext } from "../Context/ProductContext.jsx";
+import { SORT_OPTIONS } from "../constants/collection.js";
+import {
+  filterProducts,
+  getMaxProductPrice,
+  sortProducts,
+} from "../utils/productUtils.js";
 
 const CollectionScreen = () => {
-    return (
-    <div className="collection">
-        <main className="collection__main">
-        <div className="collection__header">
-            <div>
-            <h1 className="collection__title text">New arrivals</h1>
-            </div>
-            <div className="collection__breadcrumb">
-            <Link to={"/"}>
-                <span className="text">Home</span>
-            </Link>
-            <span className="text">/</span>
-            <span className="text">New arrivals</span>
-            </div>
-            <div className="collection__filter">
-            <button className="collection__filter-btn">
-                <span>Featured</span>
-            </button>
-            </div>
-        </div>
+  const { products } = useProductContext();
+  const [selectedCategories, setSelectedCategories] = useState([]);
+  const [sortOption, setSortOption] = useState("featured");
+  const maxPrice = getMaxProductPrice(products);
+  const [priceRange, setPriceRange] = useState({ min: 0, max: 0 });
 
-        <div className="collection__products">
-            {products.map((product) => (
-            <div key={product.id} className="product-card">
-                <Link to={"/collections/product/" + product.id}>
-                <div className="product-card__image-box">
-                    <img
-                        className="product-card__image"
-                        src={product.img}
-                        alt={product.name}
-                    />
-                </div>
-                <div className="product-card__details">
-                    <h3 className="text">{product.name}</h3>
-                    <p className="text">${product.price.toFixed(2)}</p>
-                </div>
-                </Link>
-            </div>
-            ))}
-        </div>
-        </main>
+  useEffect(() => {
+    setPriceRange((currentRange) => ({
+      min: Math.min(currentRange.min, maxPrice),
+      max: currentRange.max || maxPrice,
+    }));
+  }, [maxPrice]);
 
-        <Footer>
-            <Footer />
-        </Footer>
-    </div>
+  const filteredProducts = useMemo(() => {
+    const filtered = filterProducts(products, selectedCategories, priceRange);
+    return sortProducts(filtered, sortOption);
+  }, [priceRange, products, selectedCategories, sortOption]);
+
+  const handleCategoryChange = (category) => {
+    setSelectedCategories((currentCategories) =>
+      currentCategories.includes(category)
+        ? currentCategories.filter((currentCategory) => currentCategory !== category)
+        : [...currentCategories, category],
     );
+  };
+
+  const handlePriceChange = (field, value) => {
+    const numericValue = Math.max(0, Number(value) || 0);
+
+    setPriceRange((currentRange) => {
+      const nextRange = {
+        ...currentRange,
+        max: currentRange.max || maxPrice,
+        [field]: numericValue,
+      };
+
+      if (nextRange.min > nextRange.max) {
+        return field === "min"
+          ? { ...nextRange, max: nextRange.min }
+          : { ...nextRange, min: nextRange.max };
+      }
+
+      return nextRange;
+    });
+  };
+
+  const handleSortClick = () => {
+    const currentIndex = SORT_OPTIONS.indexOf(sortOption);
+    const nextIndex = (currentIndex + 1) % SORT_OPTIONS.length;
+
+    setSortOption(SORT_OPTIONS[nextIndex]);
+  };
+
+  return (
+    <div className="collection">
+      <main className="collection__main">
+        <div className="collection__breadcrumb">
+          <Link to="/">
+            <span>Home</span>
+          </Link>
+          <span>/</span>
+          <Link to="/collections">
+            <span>Shop</span>
+          </Link>
+          <span>/</span>
+          <span>New Arrivals</span>
+        </div>
+
+        <header className="collection__header">
+          <h1 className="collection__title">New Arrivals</h1>
+        </header>
+
+        <div className="collection__layout">
+          <CollectionFilters
+            maxPrice={maxPrice}
+            priceRange={priceRange}
+            selectedCategories={selectedCategories}
+            onCategoryChange={handleCategoryChange}
+            onPriceChange={handlePriceChange}
+          />
+
+          <section className="collection__content">
+            <CollectionToolbar
+              visibleCount={filteredProducts.length}
+              totalCount={products.length}
+              sortOption={sortOption}
+              onSortClick={handleSortClick}
+            />
+            <ProductGrid products={filteredProducts} />
+          </section>
+        </div>
+      </main>
+      <Footer />
+    </div>
+  );
 };
 
 export default CollectionScreen;
