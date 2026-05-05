@@ -1,165 +1,150 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import {
-  getCart,
-  addToCart,
-  removeCartItem,
-  updateCartItem
-} from "../api/cart";
 import toast from "react-hot-toast";
+import {
+  addToCart,
+  getCart,
+  removeCartItem,
+  updateCartItem,
+} from "../api/cart";
+import {
+  calculateCartTotals,
+  getCartItemSubtotal,
+  initialCart,
+  isSameCartItem,
+  normalizeCart,
+} from "../utils/cartUtils";
 
 const CartContext = createContext();
+const CART_STORAGE_KEY = "cart";
 
-const initialCart = {
-  items: [],
-  total: 0,
-  subtotal: 0,
-  total_items: 0
-}
-
-
-const calculateTotals = (items) => {
-  const total_items = items.reduce((acc, i) => acc + i.quantity, 0);
-  const subtotal = items.reduce((acc, i) => acc + (i.subtotal || 0), 0);
-
-  return {
-    total_items,
-    subtotal,
-    total: subtotal
+const getStoredCart = () => {
+  try {
+    const storedCart = localStorage.getItem(CART_STORAGE_KEY);
+    return storedCart ? normalizeCart(JSON.parse(storedCart)) : initialCart;
+  } catch (error) {
+    console.error("Error reading cart from localStorage", error);
+    return initialCart;
   }
-}
+};
 
 export const CartProvider = ({ children }) => {
-
-  const [cart, setCart] = useState(() => {
-    const stored = localStorage.getItem("cart");
-    return stored ? JSON.parse(stored) : initialCart;
-  });
-
+  const [cart, setCart] = useState(getStoredCart);
   const [loading, setLoading] = useState(true);
 
-
   useEffect(() => {
-    localStorage.setItem("cart", JSON.stringify(cart));
+    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
   }, [cart]);
-
 
   useEffect(() => {
     const syncCart = async () => {
       try {
         const data = await getCart();
-        setCart(data);
-      } catch (error) {
+        setCart(normalizeCart(data));
+      } catch (_error) {
         console.log("Backend no disponible, usando localStorage");
       } finally {
         setLoading(false);
       }
     };
 
-    syncCart()
-  }, [])
+    syncCart();
+  }, []);
 
+  const updateCartItems = (items) => ({
+    items,
+    ...calculateCartTotals(items),
+  });
 
   const handleAddToCart = async (product, quantity = 1, variant = null) => {
     try {
-      setCart((prev) => {
-        const existing = prev.items.find(
-          (i) =>
-            i.product.id === product.id &&
-            i.variant?.id === variant?.id
+      setCart((prevCart) => {
+        const existingItem = prevCart.items.find((item) =>
+          isSameCartItem(item, product, variant),
         );
 
-        let updatedItems;
-
-        if (existing) {
-          updatedItems = prev.items.map((i) =>
-            i.id === existing.id
-              ? {
-                  ...i,
-                  quantity: i.quantity + quantity,
-                  subtotal: (i.quantity + quantity) * product.price
-                }
-              : i
-          );
-        } else {
-          updatedItems = [
-            ...prev.items,
-            {
-              id: Date.now(), 
-              product,
-              variant,
-              quantity,
-              subtotal: quantity * product.price
-            }
-          ];
-        }
+        const updatedItems = existingItem
+          ? prevCart.items.map((item) =>
+              item.id === existingItem.id
+                ? {
+                    ...item,
+                    quantity: item.quantity + quantity,
+                    subtotal: getCartItemSubtotal(product, item.quantity + quantity, variant),
+                  }
+                : item,
+            )
+          : [
+              ...prevCart.items,
+              {
+                id: Date.now(),
+                product,
+                variant,
+                quantity,
+                subtotal: getCartItemSubtotal(product, quantity, variant),
+              },
+            ];
 
         return {
-          ...prev,
-          items: updatedItems,
-          ...calculateTotals(updatedItems)
+          ...prevCart,
+          ...updateCartItems(updatedItems),
         };
       });
 
-      toast.success("Producto agregado 🛒");
+      const updatedCart = await toast.promise(addToCart(product.id, quantity, variant?.id), {
+        loading: "Agregando producto...",
+        success: "Producto agregado",
+        error: "Error al agregar producto",
+      });
 
-
-      await addToCart(product.id, quantity, variant?.id);
-
+      if (updatedCart?.items) {
+        setCart(normalizeCart(updatedCart));
+      }
     } catch (error) {
       console.error(error);
-      toast.error("Error al agregar producto");
     }
   };
 
-
-  const handleRemove = async (item_id) => {
+  const handleRemove = async (itemId) => {
     try {
-      setCart((prev) => {
-        const updatedItems = prev.items.filter((i) => i.id !== item_id);
+      setCart((prevCart) => {
+        const updatedItems = prevCart.items.filter((item) => item.id !== itemId);
 
         return {
-          ...prev,
-          items: updatedItems,
-          ...calculateTotals(updatedItems)
+          ...prevCart,
+          ...updateCartItems(updatedItems),
         };
       });
 
       toast("Producto eliminado");
-
-      await removeCartItem(item_id);
-
+      await removeCartItem(itemId);
     } catch (error) {
       console.error(error);
       toast.error("Error al eliminar");
     }
   };
 
-  const handleUpdate = async (item_id, quantity) => {
-    try {
-      if (quantity < 1) return;
+  const handleUpdate = async (itemId, quantity) => {
+    if (quantity < 1) return;
 
-      setCart((prev) => {
-        const updatedItems = prev.items.map((i) =>
-          i.id === item_id
+    try {
+      setCart((prevCart) => {
+        const updatedItems = prevCart.items.map((item) =>
+          item.id === itemId
             ? {
-                ...i,
+                ...item,
                 quantity,
-                subtotal: quantity * i.product.price
+                subtotal: getCartItemSubtotal(item.product, quantity, item.variant),
               }
-            : i
+            : item,
         );
 
         return {
-          ...prev,
-          items: updatedItems,
-          ...calculateTotals(updatedItems)
+          ...prevCart,
+          ...updateCartItems(updatedItems),
         };
       });
 
       toast("Cantidad actualizada");
-
-      await updateCartItem(item_id, quantity);
-
+      await updateCartItem(itemId, quantity);
     } catch (error) {
       console.error(error);
       toast.error("Error al actualizar");
@@ -173,7 +158,7 @@ export const CartProvider = ({ children }) => {
         loading,
         handleAddToCart,
         handleRemove,
-        handleUpdate
+        handleUpdate,
       }}
     >
       {children}

@@ -1,6 +1,7 @@
 import React from "react";
-import { useCart } from "../Hooks/useCart";
+import { useCart } from "../Context/CartContext";
 import "../Styles/cart.css";
+import { formatCurrency } from "../utils/productUtils";
 
 const CartScreen = () => {
 
@@ -20,7 +21,9 @@ const CartScreen = () => {
             <div className="cart-item-info">
               <span className="cart-item-name">{item.product.name}</span>
               {item.variant && (
-                <span className="cart-item-variant">Variante: {item.variant.name}</span>
+                <span className="cart-item-variant">
+                  Variante: {item.variant.size || item.variant.name}
+                </span>
               )}
             </div>
             <div className="cart-item-actions">
@@ -33,15 +36,15 @@ const CartScreen = () => {
               <button onClick={() => handleRemove(item.id)}>Eliminar</button>
             </div>
             <div className="cart-item-subtotal">
-              Subtotal: ${Number(item.subtotal).toFixed(2)}
+              Subtotal: {formatCurrency(item.subtotal)}
             </div>
           </div>
         ))}
       </div>
       <div className="cart-summary">
         <div>Total de productos: {cart.total_items}</div>
-        <div>Subtotal: ${Number(cart.subtotal).toFixed(2)}</div>
-        <div>Total: ${Number(cart.total).toFixed(2)}</div>
+        <div>Subtotal: {formatCurrency(cart.subtotal)}</div>
+        <div>Total: {formatCurrency(cart.total)}</div>
       </div>
     </div>
   );

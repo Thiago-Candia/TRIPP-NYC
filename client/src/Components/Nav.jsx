@@ -5,7 +5,7 @@ import { Link } from "react-router-dom"
 import { Icons } from "../Assets/Icons/Icons"
 import CartSidebar from "./CartSidebar"
 
-const Nav = ({ onSearchClick }) => {
+const Nav = ({ onSearchClick = () => {} }) => {
 
   const [isCartOpen, setIsCartOpen] = useState(false)
 

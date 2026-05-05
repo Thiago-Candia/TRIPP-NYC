@@ -6,6 +6,16 @@
   text-decoration: none;
 }
 
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  overflow-x: hidden;
+}
+
 ul {
   list-style: none;
 }
