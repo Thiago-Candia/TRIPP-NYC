@@ -45,7 +45,7 @@
   border-bottom: 1px solid #eee;
 }
 
-.cart-sidebar__header button {
+.cart-sidebar__close {
   border: 1px solid #222;
   background: #fff;
   color: #000;
@@ -56,7 +56,7 @@
   height: 28px;
 }
 
-.cart-sidebar__header h2 {
+.cart-sidebar__title {
   font-size: 18px;
   font-weight: 600;
 }
@@ -110,7 +110,7 @@
   margin-top: 6px;
 }
 
-.cart-item__actions button {
+.cart-item__action-btn {
   border: 1px solid #ccc;
   background: none;
   min-width: 24px;

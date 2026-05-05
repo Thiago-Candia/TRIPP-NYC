@@ -4,6 +4,7 @@
   margin: 0;
   font-family: "Helvetica Neue", Arial, sans-serif;
   text-decoration: none;
+  list-style: none;
 }
 
 html,
@@ -14,10 +15,6 @@ body,
 
 body {
   overflow-x: hidden;
-}
-
-ul {
-  list-style: none;
 }
 
 :root {

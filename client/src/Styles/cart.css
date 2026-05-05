@@ -41,14 +41,14 @@
   gap: 8px;
 }
 
-.cart-item-actions input[type="number"] {
+.cart-item-actions__input {
   width: 60px;
   padding: 4px 8px;
   border: 1px solid #ccc;
   border-radius: 4px;
 }
 
-.cart-item-actions button {
+.cart-item-actions__remove-btn {
   background: #e74c3c;
   color: #fff;
   border: none;
@@ -58,7 +58,7 @@
   transition: background 0.2s;
 }
 
-.cart-item-actions button:hover {
+.cart-item-actions__remove-btn:hover {
   background: #c0392b;
 }
 
