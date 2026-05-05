@@ -1,11 +1,9 @@
-from rest_framework import status
-from rest_framework.response import Response
 from rest_framework.views import APIView
-
-from products.models import Product, ProductVariant
-
-from .models import CartItem
-from .serializer import CartItemSerializer, CartSerializer
+from rest_framework.response import Response
+from rest_framework import status
+from products.models import Product, ProductVariant 
+from .models import Cart, CartItem
+from .serializer import CartSerializer, CartItemSerializer
 from .services import get_or_create_cart
 
 
@@ -14,6 +12,7 @@ class CartView(APIView):
         cart = get_or_create_cart(request)
         serializer = CartSerializer(cart, context={"request": request})
         return Response(serializer.data)
+
 
     def post(self, request):
         cart = get_or_create_cart(request)
@@ -99,6 +98,5 @@ class CartItemUpdate(APIView):
                 {"error": "Item not found"},
                 status=status.HTTP_404_NOT_FOUND,
             )
-
         item.delete()
         return Response({"message": "Item deleted"}, status=status.HTTP_200_OK)
