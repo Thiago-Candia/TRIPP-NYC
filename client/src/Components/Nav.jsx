@@ -1,10 +1,15 @@
-import React from "react"
+import React, { useState } from "react"
 import logoNav from "../assets/Img/logonav.png"
 import bag from "../assets/Img/bag.png"
 import { Link } from "react-router-dom"
 import { Icons } from "../Assets/Icons/Icons"
+import CartSidebar from "./CartSidebar"
 
-const Nav = ({ onSearchClick }) => {
+const Nav = ({ onSearchClick = () => {} }) => {
+
+  const [isCartOpen, setIsCartOpen] = useState(false)
+
+
   return (
 
     <header className="header">
@@ -205,13 +210,23 @@ const Nav = ({ onSearchClick }) => {
             Account
           </Link>
 
-          <Link to="/cart" className="nav__cart">
-            <span className="nav__cart-label">Tote</span>
+          <button className="btn-config" onClick={() => setIsCartOpen(true)}>
+            <span className="nav__cart-label">
+              <i className="">
+                🛒
+              </i>
+            </span>
+          </button>
+
+          <CartSidebar
+            isOpen={isCartOpen}
+            onClose={() => setIsCartOpen(false)}
+          />
+
             <span className="nav__cart-separator">—</span>
             <div className="nav__cart-icon">
               <img src={bag} alt="Shopping bag" className="nav__cart-img" />
             </div>
-          </Link>
         </div>
       </nav>
     </header>
