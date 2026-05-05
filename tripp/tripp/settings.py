@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'products',
     'users',
     'cart',
+    'stores',
 ]
 
 MIDDLEWARE = [
@@ -136,6 +137,8 @@ ACCOUNT_EMAIL_REQUIRED = False
 ACCOUNT_USERNAME_REQUIRED = True
 ACCOUNT_AUTHENTICATION_METHOD = 'username'
 ACCOUNT_EMAIL_VERIFICATION = 'none'
+ACCOUNT_LOGIN_METHODS = {'username'}
+ACCOUNT_SIGNUP_FIELDS = ['email', 'username*', 'password1*', 'password2*']
 
 
 
@@ -182,6 +185,7 @@ SITE_ID = 1
 
 
 STATIC_URL = 'static/'
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 """ CORS """
 

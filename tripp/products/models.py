@@ -1,6 +1,7 @@
 from django.db import models
 from django.core.validators import MinValueValidator
 from django.utils.text import slugify
+from stores.models import Store
 
 class Category(models.Model):
     name = models.CharField(max_length=100)
@@ -36,6 +37,13 @@ class Category(models.Model):
 
 
 class Product(models.Model):
+    store = models.ForeignKey(
+        Store,
+        on_delete=models.CASCADE,
+        related_name="products",
+        null=True,
+        blank=True,
+    )
     name = models.CharField(max_length=200)
     description = models.TextField(blank=True)
     price = models.DecimalField(

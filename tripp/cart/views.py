@@ -3,9 +3,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
 from .models import Cart, CartItem
-from .serializer import CartItemSerializer, CartItem
-from .serializer import CartSerializer, CartItemSerializer, CartItem
-from products.models import Product, ProductVariant
+from .serializer import CartSerializer, CartItemSerializer
+from products.models import Product
 
 
 
@@ -13,7 +12,7 @@ class CartView(APIView):
 
   def get_cart(self, request):
     if request.user.is_authenticated:
-      cart, created = Cart.objects.get_or_create(user=request.user)
+      cart, created = Cart.objects.get_or_create(auth_user=request.user)
     else:
       session_id = request.session.session_key
       if not session_id:
