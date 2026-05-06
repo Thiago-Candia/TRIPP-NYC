@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useMemo, useState } from "react";
 import { getMe, loginRequest, registerRequest } from "../api/auth";
 
 const AuthContext = createContext();
@@ -8,7 +8,7 @@ export const AuthProvider = ({ children }) => {
   const [loadingUser, setLoadingUser] = useState(false);
   const [activeStoreId, setActiveStoreId] = useState(localStorage.getItem("active_store_id"));
 
-  const persistSession = (data) => {
+  const persistSession = useCallback((data) => {
     localStorage.setItem("access_token", data.access);
     localStorage.setItem("refresh_token", data.refresh);
     if (data.user?.stores?.length && !localStorage.getItem("active_store_id")) {
@@ -16,21 +16,21 @@ export const AuthProvider = ({ children }) => {
       setActiveStoreId(String(data.user.stores[0].store_id));
     }
     setUser(data.user);
-  };
+  }, []);
 
-  const login = async (username, password) => {
+  const login = useCallback(async (username, password) => {
     const data = await loginRequest(username, password);
     persistSession(data);
     return data.user;
-  };
+  }, [persistSession]);
 
-  const register = async ({ username, email, password }) => {
+  const register = useCallback(async ({ username, email, password }) => {
     const data = await registerRequest({ username, email, password });
     persistSession(data);
     return data.user;
-  };
+  }, [persistSession]);
 
-  const fetchCurrentUser = async () => {
+  const fetchCurrentUser = useCallback(async () => {
     setLoadingUser(true);
     try {
       const me = await getMe();
@@ -43,20 +43,20 @@ export const AuthProvider = ({ children }) => {
     } finally {
       setLoadingUser(false);
     }
-  };
+  }, []);
 
-  const logout = () => {
+  const logout = useCallback(() => {
     localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");
     localStorage.removeItem("active_store_id");
     setActiveStoreId(null);
     setUser(null);
-  };
+  }, []);
 
-  const setActiveStore = (storeId) => {
+  const setActiveStore = useCallback((storeId) => {
     localStorage.setItem("active_store_id", String(storeId));
     setActiveStoreId(String(storeId));
-  };
+  }, []);
 
   const value = useMemo(
     () => ({
@@ -73,7 +73,7 @@ export const AuthProvider = ({ children }) => {
         user?.role === "admin" ||
         Boolean(user?.stores?.some((store) => ["owner", "manager"].includes(store.role))),
     }),
-    [user, loadingUser, activeStoreId]
+    [user, loadingUser, login, register, logout, fetchCurrentUser, activeStoreId, setActiveStore]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

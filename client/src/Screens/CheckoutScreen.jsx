@@ -179,7 +179,7 @@ const CheckoutScreen = () => {
               </div>
 
               <p className="checkout__privacy">
-                We'll send your order confirmation to this email.
+                We will send your order confirmation to this email.
               </p>
             </section>
           )}

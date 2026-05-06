@@ -14,7 +14,6 @@ export const ProductScreen = () => {
     const {id} = useParams();
 
     const [product, setProduct] = useState({});
-    const [selectedVariant, setSelectedVariant] = useState(null);
     const [selectedSize, setSelectedSize] = useState("");
     const [isFavorite, setIsFavorite] = useState(false);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -181,7 +180,7 @@ export const ProductScreen = () => {
                         </p>
                         <ul className="product__features">
                             <li className="product__features-item">
-                                – Refer to Size Chart (Based on Men's Sizing)
+                                - Refer to Size Chart (Based on Mens Sizing)
                             </li>
                             <li className="product__features-item">
                                 – Adjustable fit for comfort
