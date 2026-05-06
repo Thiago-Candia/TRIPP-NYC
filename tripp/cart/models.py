@@ -84,14 +84,11 @@ class CartItem(models.Model):
   class Meta:
     unique_together = ['cart', 'product', 'variant']
   def __str__(self):
-<<<<<<< HEAD
     if self.variant:
       return f"{self.quantity} x {self.product.name} ({self.variant})"
     return f"{self.quantity} x {self.product.name}"
-=======
     variant_label = f" ({self.variant})" if self.variant else ""
     return f"{self.quantity} x {self.product.name}{variant_label}"
->>>>>>> 0669b6a (users-orders-cart-dashboard)
   
   @property
   def subtotal(self):
