@@ -25,8 +25,8 @@ const CartSidebar = ({ isOpen, onClose }) => {
       />
       <aside className={`cart-sidebar ${isOpen ? "open" : ""}`}>
         <div className="cart-sidebar__header">
-          <h2>Cart</h2>
-          <button onClick={onClose} aria-label="Close cart">
+          <h2 className="cart-sidebar__title">Cart</h2>
+          <button className="cart-sidebar__close" onClick={onClose} aria-label="Close cart">
             x
           </button>
         </div>
@@ -57,11 +57,11 @@ const CartSidebar = ({ isOpen, onClose }) => {
                   )}
 
                   <div className="cart-item__actions">
-                    <button onClick={() => handleUpdate(item.id, item.quantity - 1)}>
+                    <button className="cart-item__action-btn" onClick={() => handleUpdate(item.id, item.quantity - 1)}>
                       -
                     </button>
-                    <span>{item.quantity}</span>
-                    <button onClick={() => handleUpdate(item.id, item.quantity + 1)}>
+                    <span className="cart-item__quantity">{item.quantity}</span>
+                    <button className="cart-item__action-btn" onClick={() => handleUpdate(item.id, item.quantity + 1)}>
                       +
                     </button>
                     <button

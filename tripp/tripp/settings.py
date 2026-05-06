@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'products',
     'users',
     'cart',
+    'stores',
 ]
 
 MIDDLEWARE = [
@@ -135,6 +136,8 @@ AUTHENTICATION_BACKENDS = [
 ACCOUNT_LOGIN_METHODS = {'username'}
 ACCOUNT_SIGNUP_FIELDS = ['email', 'username*', 'password1*', 'password2*']
 ACCOUNT_EMAIL_VERIFICATION = 'none'
+ACCOUNT_LOGIN_METHODS = {'username'}
+ACCOUNT_SIGNUP_FIELDS = ['email', 'username*', 'password1*', 'password2*']
 
 
 
@@ -149,7 +152,11 @@ SIMPLE_JWT = {
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
     ),
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',
+    ],
     'DEFAULT_FILTER_BACKENDS': [
         'django_filters.rest_framework.DjangoFilterBackend'
     ],
@@ -181,6 +188,7 @@ SITE_ID = 1
 
 
 STATIC_URL = 'static/'
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 """ CORS """
 

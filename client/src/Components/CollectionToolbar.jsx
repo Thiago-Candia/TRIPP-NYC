@@ -12,7 +12,7 @@ const CollectionToolbar = ({
       <button className="collection__sort" onClick={onSortClick}>
         {SORT_LABELS[sortOption]}
       </button>
-      <span>
+      <span className="collection__toolbar-count">
         {visibleCount} of {totalCount} products
       </span>
     </div>

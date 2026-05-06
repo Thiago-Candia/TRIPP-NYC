@@ -1,6 +1,7 @@
 from django.db import models
 from django.core.validators import MinValueValidator
 from django.utils.text import slugify
+from stores.models import Store
 
 class Category(models.Model):
     name = models.CharField(max_length=100)
@@ -36,6 +37,13 @@ class Category(models.Model):
 
 
 class Product(models.Model):
+    store = models.ForeignKey(
+        Store,
+        on_delete=models.CASCADE,
+        related_name="products",
+        null=True,
+        blank=True,
+    )
     name = models.CharField(max_length=200)
     description = models.TextField(blank=True)
     price = models.DecimalField(
@@ -54,7 +62,7 @@ class Product(models.Model):
     )
 
     slug = models.SlugField(max_length=255, unique=True, blank=True)
-    sku = models.CharField(max_length=255, unique=True, blank=True)
+    sku = models.CharField(max_length=255, unique=True, blank=True, null=True)
 
     stock = models.IntegerField(default=0, validators=[MinValueValidator(0)])
 
@@ -81,7 +89,16 @@ class Product(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.name)
+            base_slug = slugify(self.name)
+            slug = base_slug
+            counter = 1
+            while Product.objects.filter(slug=slug).exclude(pk=self.pk).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+            self.slug = slug
+        # Normalize empty sku to None so the unique constraint allows multiple blanks
+        if not self.sku:
+            self.sku = None
         super().save(*args, **kwargs)
 
     @property
@@ -131,7 +148,7 @@ class ProductVariant(models.Model):
         help_text='Hex code: #000000'
     )
 
-    sku = models.CharField(max_length=50, unique=True)
+    sku = models.CharField(max_length=50, unique=True, blank=True, null=True)
 
     price_adjustment = models.DecimalField(
         max_digits=10, 

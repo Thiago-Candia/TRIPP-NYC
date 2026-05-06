@@ -22,7 +22,7 @@ const ProductCard = ({ product, variant = "default" }) => {
 
   return (
     <article className={`product-card product-card--${variant}`}>
-      <Link to={productUrl}>
+      <Link className="product-card__link" to={productUrl}>
         <div className="product-card__image-box">
           <img
             className="product-card__image"
@@ -31,8 +31,8 @@ const ProductCard = ({ product, variant = "default" }) => {
           />
         </div>
         <div className="product-card__details">
-          <h3>{product.name}</h3>
-          <p>{formatCurrency(product.price)}</p>
+          <h3 className="product-card__title">{product.name}</h3>
+          <p className="product-card__price">{formatCurrency(product.price)}</p>
         </div>
       </Link>
 

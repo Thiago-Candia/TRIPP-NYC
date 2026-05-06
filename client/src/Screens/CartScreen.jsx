@@ -14,7 +14,7 @@ const CartScreen = () => {
 
   return (
     <div className="cart-container">
-      <h2>Carrito de Compras</h2>
+      <h2 className="cart-title">Carrito de Compras</h2>
       <div className="cart-items-list">
         {cart.items.map((item) => (
           <div key={item.id} className="cart-item">
@@ -28,12 +28,13 @@ const CartScreen = () => {
             </div>
             <div className="cart-item-actions">
               <input
+                className="cart-item-actions__input"
                 type="number"
                 min={1}
                 value={item.quantity}
                 onChange={e => handleUpdate(item.id, Number(e.target.value))}
               />
-              <button onClick={() => handleRemove(item.id)}>Eliminar</button>
+              <button className="cart-item-actions__remove-btn" onClick={() => handleRemove(item.id)}>Eliminar</button>
             </div>
             <div className="cart-item-subtotal">
               Subtotal: {formatCurrency(item.subtotal)}
