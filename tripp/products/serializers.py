@@ -22,6 +22,10 @@ class ProductVariantSerializer(serializers.ModelSerializer):
     model = ProductVariant
     fields = '__all__'
     read_only_fields = ['id', 'created_at', 'updated_at']
+    extra_kwargs = {
+      'sku': {'required': False, 'allow_blank': True, 'allow_null': True},
+      'product': {'required': False},
+    }
 
 
 class ProductImageSerializer(serializers.ModelSerializer):
@@ -47,7 +51,10 @@ class ProductSerializer(serializers.ModelSerializer):
   class Meta:
     model = Product
     fields = '__all__'
-    read_only_fields = ['id', 'created_at', 'updated_at']
+    read_only_fields = ['id', 'slug', 'created_at', 'updated_at']
+    extra_kwargs = {
+      'sku': {'required': False, 'allow_blank': True, 'allow_null': True},
+    }
 
   def get_is_on_sale(self, obj):
     return obj.is_on_sale
