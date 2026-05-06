@@ -90,8 +90,9 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background-color: var(--green-footer);
-  padding: 30px 20px;
+  background-color: #111;
+  border-top: 1px solid #2a2a2a;
+  padding: 34px 20px;
   width: 100%;
 }
 
@@ -111,9 +112,9 @@
   text-align: center;
 }
 
-.footer-container__content p {
+.footer-container__text {
   margin: 5px 0;
-  color: #000;
+  color: #fff;
   font-size: 14px;
 }
 
@@ -125,7 +126,7 @@
 }
 
 .footer__container__link .footer__link {
-  color: #000;
+  color: #fff;
   font-weight: 600;
   text-decoration: none;
   transition: opacity 0.3s ease;

@@ -1,28 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import "../Styles/styles.css";
-import CollectionScreen from "../Screens/CollectionScreen.jsx";
 import { Link } from "react-router-dom";
 import intro from "../assets/Img/intro.jpg";
 import intro2 from "../assets/Img/intro2.jpg";
-import { getProducts } from "../api/products.js";
+import { useProductContext } from "../Context/ProductContext.jsx";
+import ProductCard from "./ProductCard.jsx";
 
 const MainContainerHome = () => {
-
-  const [products, setProducts] = useState([]);
-
-  useEffect(() => {
-  const fetchData = async () => {
-    try {
-      const data = await getProducts();
-      setProducts(data.results);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  fetchData();
-}, []);
-
+  const { products } = useProductContext();
 
   return (
     <main className="main-home">
@@ -44,21 +29,7 @@ const MainContainerHome = () => {
 
       <div className="products__list">
         {products.map((product) => (
-          <div key={product.id} className="product-card">
-            <Link to={"/collections/product/" + product.id}>
-              <div className="product-card__image-box">
-                <img
-                  className="product-card__image"
-                  src={product.primary_image}
-                  alt={product.name}
-                />
-              </div>
-              <div className="product-card__details">
-                <h3>{product.name}</h3>
-                <p>${Number(product.price).toFixed(2)}</p>
-              </div>
-            </Link>
-          </div>
+          <ProductCard key={product.id} product={product} variant="home" />
         ))}
       </div>
     </main>

@@ -4,10 +4,17 @@
   margin: 0;
   font-family: "Helvetica Neue", Arial, sans-serif;
   text-decoration: none;
+  list-style: none;
 }
 
-ul {
-  list-style: none;
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  overflow-x: hidden;
 }
 
 :root {
