@@ -8,6 +8,7 @@ pnpm-debug.log*
 lerna-debug.log*
 node_modules
 dist
+dist/
 dist-ssr
 *.local
 
@@ -32,3 +33,6 @@ __pycache__/
 *.pyo
 *.pyd
 .pytest_cache/
+db.sqlite3
+tripp/db.sqlite3
+media/

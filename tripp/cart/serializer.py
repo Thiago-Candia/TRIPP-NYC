@@ -5,8 +5,9 @@ from products.serializers import ProductSerializer, ProductVariantSerializer
 
 class CartItemSerializer(serializers.ModelSerializer):
   product = ProductSerializer(read_only=True)
+  variant = ProductVariantSerializer(read_only=True)
   product_id = serializers.IntegerField(write_only=True)
-  variant_id = serializers.IntegerField(write_only=True, required=False)
+  variant_id = serializers.IntegerField(write_only=True, required=False, allow_null=True)
   subtotal = serializers.DecimalField(max_digits=10, decimal_places=2, read_only=True)
 
   class Meta:
