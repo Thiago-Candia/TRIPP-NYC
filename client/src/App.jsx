@@ -6,36 +6,22 @@ import { ProductScreen } from './Screens/ProductScreen'
 import CartScreen from './Screens/CartScreen'
 import DashboardScreen from './Screens/DashboardScreen'
 import AccountScreen from './Screens/AccountScreen'
+import CheckoutScreen from './Screens/CheckoutScreen'
+import OrderSuccessScreen from './Screens/OrderSuccessScreen'
 
 function App() {
 
   return (
     <>
       <Routes>
-        <Route 
-          path='/' 
-          element={<HomeScreen/>}>
-        </Route>
-        <Route
-          path='/collections'
-          element={<CollectionScreen/>}>
-        </Route>
-        <Route
-          path='/collections/product/:id'
-          element={<ProductScreen/>}>
-        </Route>
-        <Route
-          path='/cart'
-          element={<CartScreen/>}>
-        </Route>
-        <Route
-          path='/dashboard'
-          element={<DashboardScreen/>}>
-        </Route>
-        <Route
-          path='/account'
-          element={<AccountScreen/>}>
-        </Route>
+        <Route path='/' element={<HomeScreen/>} />
+        <Route path='/collections' element={<CollectionScreen/>} />
+        <Route path='/collections/product/:id' element={<ProductScreen/>} />
+        <Route path='/cart' element={<CartScreen/>} />
+        <Route path='/dashboard' element={<DashboardScreen/>} />
+        <Route path='/account' element={<AccountScreen/>} />
+        <Route path='/checkout' element={<CheckoutScreen/>} />
+        <Route path='/order-success' element={<OrderSuccessScreen/>} />
       </Routes>
     </>
   )
