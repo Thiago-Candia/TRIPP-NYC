@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "react-hot-toast";
 import {
   createDashboardProduct,
   deleteDashboardProduct,
@@ -51,12 +52,24 @@ const ProductsModule = () => {
       setEditingId(null);
       setProductForm(emptyForm);
       setFiles([]);
+      toast.success("Producto guardado correctamente");
     },
+    onError: (error) => {
+      console.error(error);
+      const msg = error.response?.data ? JSON.stringify(error.response.data) : "Error desconocido";
+      toast.error(`Error al guardar: ${msg}`);
+    }
   });
 
   const deleteMutation = useMutation({
     mutationFn: deleteDashboardProduct,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["dashboard-products"] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["dashboard-products"] });
+      toast.success("Producto eliminado");
+    },
+    onError: () => {
+      toast.error("Error al eliminar el producto");
+    }
   });
 
   const filtered = useMemo(() => {
@@ -89,17 +102,23 @@ const ProductsModule = () => {
     });
   };
 
-  const payload = () => ({
-    ...productForm,
-    price: Number(productForm.price || 0),
-    compare_at_price: productForm.compare_at_price ? Number(productForm.compare_at_price) : null,
-    stock: Number(productForm.stock || 0),
-    variants: productForm.variants.filter((v) => v.sku).map((v) => ({
-      ...v,
-      price_adjustment: Number(v.price_adjustment || 0),
-      stock: Number(v.stock || 0),
-    })),
-  });
+  const payload = () => {
+    return {
+      ...productForm,
+      price: Number(productForm.price || 0),
+      compare_at_price: productForm.compare_at_price ? Number(productForm.compare_at_price) : null,
+      sku: productForm.sku || `PROD-${Date.now()}`,
+      stock: Number(productForm.stock || 0),
+      variants: productForm.variants
+        .filter((v) => v.size || v.color || v.sku)
+        .map((v, i) => ({
+          ...v,
+          sku: v.sku || `VAR-${Date.now()}-${i}`,
+          price_adjustment: Number(v.price_adjustment || 0),
+          stock: Number(v.stock || 0),
+        })),
+    };
+  };
 
   return (
     <div className="dashboard-grid">
@@ -118,7 +137,7 @@ const ProductsModule = () => {
           <input className="dashboard-field" type="number" step="0.01" value={productForm.compare_at_price} placeholder="Precio comparado" onChange={(e) => setProductForm((p) => ({ ...p, compare_at_price: e.target.value }))} />
         </div>
         <div className="row">
-          <input className="dashboard-field" value={productForm.sku} placeholder="SKU" onChange={(e) => setProductForm((p) => ({ ...p, sku: e.target.value }))} />
+          <input className="dashboard-field" value={productForm.sku} placeholder="SKU (opcional)" onChange={(e) => setProductForm((p) => ({ ...p, sku: e.target.value }))} />
           <input className="dashboard-field" type="number" value={productForm.stock} placeholder="Stock" onChange={(e) => setProductForm((p) => ({ ...p, stock: e.target.value }))} />
         </div>
         <label className="dropzone" onDragOver={(e) => e.preventDefault()} onDrop={(e) => {
@@ -147,8 +166,22 @@ const ProductsModule = () => {
 
         <h3 className="dashboard-card__subtitle">Variantes</h3>
         {productForm.variants.map((variant, index) => (
-          <div className="variant-row" key={`${variant.sku}-${index}`}>
-            <input className="dashboard-field" value={variant.size} placeholder="Talle" onChange={(e) => setVariantValue(index, "size", e.target.value)} />
+          <div className="variant-row" key={index}>
+            <select 
+              className="dashboard-field" 
+              value={variant.size} 
+              onChange={(e) => setVariantValue(index, "size", e.target.value)}
+            >
+              <option value="">Sin Talle</option>
+              <option value="XXS">XX-Small</option>
+              <option value="XS">X-Small</option>
+              <option value="S">Small</option>
+              <option value="M">Medium</option>
+              <option value="L">Large</option>
+              <option value="XL">X-Large</option>
+              <option value="XXL">XX-Large</option>
+              <option value="XXXL">XXX-Large</option>
+            </select>
             <input className="dashboard-field" value={variant.color} placeholder="Color" onChange={(e) => setVariantValue(index, "color", e.target.value)} />
             <input className="dashboard-field" value={variant.sku} placeholder="SKU variante" onChange={(e) => setVariantValue(index, "sku", e.target.value)} />
             <button className="dashboard-btn dashboard-btn--icon" type="button" onClick={() => setProductForm((p) => ({ ...p, variants: p.variants.filter((_, i) => i !== index) }))}>x</button>
@@ -189,7 +222,7 @@ const ProductsModule = () => {
                     {product.images?.[0] && (
                       <button className="dashboard-btn dashboard-btn--table"
                         onClick={() => deleteProductImage(product.id, product.images[0].id).then(() => {
-                          queryClient.invalidateQueries({ queryKey: ["dashboard-products"] });
+                          queryClient.invalidateQueries({ queryKey: ["dashboard-products"] })
                         })}
                       >
                         Borrar imagen
@@ -203,7 +236,7 @@ const ProductsModule = () => {
         </div>
       </article>
     </div>
-  );
-};
+  )
+}
 
-export default ProductsModule;
+export default ProductsModule

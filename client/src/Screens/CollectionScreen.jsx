@@ -5,6 +5,7 @@ import Footer from "../Components/Footer.jsx";
 import CollectionFilters from "../Components/CollectionFilters.jsx";
 import CollectionToolbar from "../Components/CollectionToolbar.jsx";
 import ProductGrid from "../Components/ProductGrid.jsx";
+import Nav from "../Components/Nav.jsx";
 import { useProductContext } from "../Context/ProductContext.jsx";
 import { SORT_OPTIONS } from "../constants/collection.js";
 import {
@@ -69,6 +70,7 @@ const CollectionScreen = () => {
 
   return (
     <div className="collection">
+      <Nav />
       <main className="collection__main">
         <div className="collection__breadcrumb">
           <Link className="collection__breadcrumb-link" to="/">
