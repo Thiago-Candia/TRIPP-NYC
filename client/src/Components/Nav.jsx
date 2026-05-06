@@ -4,10 +4,15 @@ import bag from "../assets/Img/bag.png"
 import { Link } from "react-router-dom"
 import { Icons } from "../Assets/Icons/Icons"
 import CartSidebar from "./CartSidebar"
+import SearchDrawer from "./SearchDrawer"
+import { useCart } from "../Context/CartContext"
+import "../Styles/search-drawer.css"
 
 const Nav = ({ onSearchClick = () => {} }) => {
 
   const [isCartOpen, setIsCartOpen] = useState(false)
+  const [isSearchOpen, setIsSearchOpen] = useState(false)
+  const { itemCount } = useCart()
 
 
   return (
@@ -200,7 +205,10 @@ const Nav = ({ onSearchClick = () => {} }) => {
         <div className="nav__actions">
           <button
             className="nav__action-btn"
-            onClick={onSearchClick}
+            onClick={() => {
+              setIsSearchOpen(true)
+              onSearchClick()
+            }}
             aria-label="Open search"
           >
             <Icons.MagnifyingGlass />
@@ -210,12 +218,13 @@ const Nav = ({ onSearchClick = () => {} }) => {
             Account
           </Link>
 
-          <button className="btn-config" onClick={() => setIsCartOpen(true)}>
-            <span className="nav__cart-label">
-              <i className="">
-                🛒
-              </i>
-            </span>
+          <button className="btn-config" onClick={() => setIsCartOpen(true)} aria-label="Open cart">
+              <div className="nav__cart-icon">
+                <img src={bag} alt="Shopping bag" className="nav__cart-img" />
+                {itemCount > 0 && (
+                  <span className="nav__cart-badge">{itemCount > 99 ? "99+" : itemCount}</span>
+                )}
+              </div>
           </button>
 
           <CartSidebar
@@ -223,10 +232,10 @@ const Nav = ({ onSearchClick = () => {} }) => {
             onClose={() => setIsCartOpen(false)}
           />
 
-            <span className="nav__cart-separator">—</span>
-            <div className="nav__cart-icon">
-              <img src={bag} alt="Shopping bag" className="nav__cart-img" />
-            </div>
+          <SearchDrawer
+            isOpen={isSearchOpen}
+            onClose={() => setIsSearchOpen(false)}
+          />
         </div>
       </nav>
     </header>

@@ -17,11 +17,12 @@ const CollectionFilters = ({
           {COLLECTION_CATEGORIES.map((category) => (
             <label key={category} className="collection__check">
               <input
+                className="collection__check-input"
                 type="checkbox"
                 checked={selectedCategories.includes(category)}
                 onChange={() => onCategoryChange(category)}
               />
-              <span>{category}</span>
+              <span className="collection__check-label">{category}</span>
             </label>
           ))}
         </div>
@@ -34,6 +35,7 @@ const CollectionFilters = ({
         </p>
         <div className="collection__range">
           <input
+            className="collection__range-input"
             type="range"
             min="0"
             max={maxPrice}
@@ -43,9 +45,10 @@ const CollectionFilters = ({
           />
         </div>
         <div className="collection__price-inputs">
-          <label>
-            <span>$</span>
+          <label className="collection__price-label">
+            <span className="collection__price-currency">$</span>
             <input
+              className="collection__price-input"
               type="number"
               min="0"
               max={priceRange.max}
@@ -53,9 +56,10 @@ const CollectionFilters = ({
               onChange={(event) => onPriceChange("min", event.target.value)}
             />
           </label>
-          <label>
-            <span>$</span>
+          <label className="collection__price-label">
+            <span className="collection__price-currency">$</span>
             <input
+              className="collection__price-input"
               type="number"
               min={priceRange.min}
               max={maxPrice}

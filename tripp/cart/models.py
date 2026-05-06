@@ -1,9 +1,18 @@
 from django.db import models
+from django.contrib.auth.models import User
 from users.models import CustomUser
 from products.models import Product, ProductVariant
 
 
 class Cart(models.Model):
+  auth_user = models.OneToOneField(
+    User,
+    on_delete=models.CASCADE,
+    null=True,
+    blank=True,
+    related_name='auth_cart'
+  )
+
   user = models.OneToOneField(
     CustomUser,
     on_delete=models.CASCADE,
@@ -39,6 +48,8 @@ class Cart(models.Model):
     self.items.all().delete()
 
   def __str__(self):
+    if self.auth_user:
+      return f"Cart for {self.auth_user}"
     if self.user:
       return f"Cart for {self.user}"
     return f"Cart with session ID: {self.session_id}"
@@ -73,9 +84,14 @@ class CartItem(models.Model):
   class Meta:
     unique_together = ['cart', 'product', 'variant']
   def __str__(self):
+<<<<<<< HEAD
+=======
     if self.variant:
       return f"{self.quantity} x {self.product.name} ({self.variant})"
     return f"{self.quantity} x {self.product.name}"
+>>>>>>> origin/backend
+    variant_label = f" ({self.variant})" if self.variant else ""
+    return f"{self.quantity} x {self.product.name}{variant_label}"
   
   @property
   def subtotal(self):
