@@ -12,9 +12,24 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 
 from pathlib import Path
 from datetime import timedelta
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+
+def load_local_env(path):
+    if not path.exists():
+        return
+    for raw_line in path.read_text(encoding="utf-8").splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, value = line.split("=", 1)
+        os.environ.setdefault(key.strip(), value.strip().strip('"').strip("'"))
+
+
+load_local_env(BASE_DIR / ".env")
 
 
 # Quick-start development settings - unsuitable for production
@@ -26,7 +41,15 @@ SECRET_KEY = 'django-insecure-9avau#^!pm(y8mma3g0+=3bwvs48kk0ncq@b)b08y*#2gd+9zc
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    "pagan-daybed-coronary.ngrok-free.dev",
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://pagan-daybed-coronary.ngrok-free.dev",
+]
 
 SITE_ID = 1
 
@@ -55,6 +78,7 @@ INSTALLED_APPS = [
     'users',
     'cart',
     'stores',
+    'orders',
 ]
 
 MIDDLEWARE = [
@@ -197,3 +221,9 @@ CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173'
 ]
+
+FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://localhost:5173')
+BACKEND_URL = os.getenv('BACKEND_URL', 'http://localhost:8000')
+MERCADOPAGO_ACCESS_TOKEN = os.getenv('MERCADOPAGO_ACCESS_TOKEN', '')
+MERCADOPAGO_WEBHOOK_SECRET = os.getenv('MERCADOPAGO_WEBHOOK_SECRET', '')
+CHECKOUT_SHIPPING_COST = os.getenv('CHECKOUT_SHIPPING_COST', '12.99')
