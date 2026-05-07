@@ -76,7 +76,6 @@ const Nav = ({ onSearchClick = () => {} }) => {
               </div>
             </li>
 
-            {/* MEN */}
             <li className="nav__item">
               <div className="nav__dropdown">
                 <Link to="/" className="nav__link">
@@ -132,7 +131,6 @@ const Nav = ({ onSearchClick = () => {} }) => {
               </div>
             </li>
 
-            {/* DARKSTREET */}
             <li className="nav__item">
               <div className="nav__dropdown">
                 <Link to="/" className="nav__link">
@@ -183,7 +181,6 @@ const Nav = ({ onSearchClick = () => {} }) => {
               </div>
             </li>
 
-            {/* SALE */}
             <li className="nav__item">
               <div className="nav__dropdown">
                 <Link to="/sale" className="nav__link">
@@ -194,14 +191,12 @@ const Nav = ({ onSearchClick = () => {} }) => {
           </ul>
         </div>
 
-        {/* LOGO */}
         <div className="nav__logo">
           <Link to="/">
             <img src={logoNav} alt="TRIPP NYC Logo" className="nav__logo-img" />
           </Link>
         </div>
 
-        {/* ACTIONS */}
         <div className="nav__actions">
           <button
             className="nav__action-btn"
