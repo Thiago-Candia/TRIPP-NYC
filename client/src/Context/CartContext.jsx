@@ -180,6 +180,36 @@ export const CartProvider = ({ children }) => {
     }
   }, []);
 
+  const ensureServerCart = useCallback(async () => {
+    let serverCart = null;
+
+    try {
+      serverCart = normalizeCart(await getCart());
+    } catch {
+      serverCart = initialCart;
+    }
+
+    if (serverCart.items.length > 0) {
+      setCart(serverCart);
+      return serverCart;
+    }
+
+    const localCart = getStoredCart();
+    if (!localCart.items.length) return localCart;
+
+    let latestCart = serverCart;
+    for (const item of localCart.items) {
+      const productId = item.product?.id;
+      if (!productId) continue;
+      latestCart = normalizeCart(
+        await addToCart(productId, item.quantity || 1, item.variant?.id),
+      );
+    }
+
+    setCart(latestCart);
+    return latestCart;
+  }, []);
+
   const itemCount = useMemo(
     () => cart.items.reduce((sum, item) => sum + (item.quantity || 0), 0),
     [cart.items],
@@ -195,6 +225,7 @@ export const CartProvider = ({ children }) => {
         handleRemove,
         handleUpdate,
         handleClearCart,
+        ensureServerCart,
       }}
     >
       {children}
