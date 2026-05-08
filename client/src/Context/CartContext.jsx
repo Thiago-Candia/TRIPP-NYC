@@ -1,7 +1,15 @@
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import toast from "react-hot-toast";
 import {
   addToCart,
+  clearCart,
   getCart,
   removeCartItem,
   updateCartItem,
@@ -30,132 +38,181 @@ export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState(getStoredCart);
   const [loading, setLoading] = useState(true);
 
-  // Persist to localStorage on every change
   useEffect(() => {
     localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
   }, [cart]);
 
-  // Sync from backend on mount
   useEffect(() => {
     const syncCart = async () => {
       try {
         const data = await getCart();
         setCart(normalizeCart(data));
       } catch {
-        // Backend unavailable — fall back to localStorage silently
+        // Backend unavailable; keep the local cart.
       } finally {
         setLoading(false);
       }
     };
+
     syncCart();
   }, []);
 
-  // Helper: recompute totals from items array
-  const buildCart = useCallback((items) => ({
-    items,
-    ...calculateCartTotals(items),
-  }), []);
+  const buildCart = useCallback(
+    (items) => ({
+      items,
+      ...calculateCartTotals(items),
+    }),
+    [],
+  );
 
-  // ── Add ────────────────────────────────────────────────────────
-  const handleAddToCart = useCallback(async (product, quantity = 1, variant = null) => {
-    // Optimistic update
-    setCart((prev) => {
-      const existing = prev.items.find((i) => isSameCartItem(i, product, variant));
-      const updatedItems = existing
-        ? prev.items.map((i) =>
-            i.id === existing.id
-              ? {
-                  ...i,
-                  quantity: i.quantity + quantity,
-                  subtotal: getCartItemSubtotal(product, i.quantity + quantity, variant),
-                }
-              : i
-          )
-        : [
-            ...prev.items,
-            {
-              id: `temp_${Date.now()}`,
-              product,
-              variant,
-              quantity,
-              subtotal: getCartItemSubtotal(product, quantity, variant),
-            },
-          ];
-      return { ...prev, ...buildCart(updatedItems) };
-    });
+  const handleAddToCart = useCallback(
+    async (product, quantity = 1, variant = null) => {
+      setCart((prev) => {
+        const existing = prev.items.find((item) =>
+          isSameCartItem(item, product, variant),
+        );
+        const updatedItems = existing
+          ? prev.items.map((item) =>
+              item.id === existing.id
+                ? {
+                    ...item,
+                    quantity: item.quantity + quantity,
+                    subtotal: getCartItemSubtotal(
+                      product,
+                      item.quantity + quantity,
+                      variant,
+                    ),
+                  }
+                : item,
+            )
+          : [
+              ...prev.items,
+              {
+                id: `temp_${Date.now()}`,
+                product,
+                variant,
+                quantity,
+                subtotal: getCartItemSubtotal(product, quantity, variant),
+              },
+            ];
 
-    try {
-      const updatedCart = await toast.promise(
-        addToCart(product.id, quantity, variant?.id),
-        {
-          loading: "Adding to cart…",
-          success: `${product.name} added!`,
-          error: "Failed to add product",
+        return { ...prev, ...buildCart(updatedItems) };
+      });
+
+      try {
+        const updatedCart = await toast.promise(
+          addToCart(product.id, quantity, variant?.id),
+          {
+            loading: "Adding to cart...",
+            success: `${product.name} added!`,
+            error: "Failed to add product",
+          },
+        );
+
+        if (updatedCart?.items) {
+          setCart(normalizeCart(updatedCart));
         }
-      );
-      // Replace optimistic state with real backend IDs
-      if (updatedCart?.items) {
-        setCart(normalizeCart(updatedCart));
+      } catch (error) {
+        console.error("addToCart error:", error);
       }
-    } catch (err) {
-      console.error("addToCart error:", err);
-    }
-  }, [buildCart]);
+    },
+    [buildCart],
+  );
 
-  // ── Remove ─────────────────────────────────────────────────────
-  const handleRemove = useCallback(async (itemId) => {
-    setCart((prev) => ({
-      ...prev,
-      ...buildCart(prev.items.filter((i) => i.id !== itemId)),
-    }));
+  const handleRemove = useCallback(
+    async (itemId) => {
+      setCart((prev) => ({
+        ...prev,
+        ...buildCart(prev.items.filter((item) => item.id !== itemId)),
+      }));
 
-    try {
-      await removeCartItem(itemId);
-      toast("Item removed");
-    } catch (err) {
-      console.error("removeCartItem error:", err);
-      toast.error("Failed to remove item");
-    }
-  }, [buildCart]);
+      try {
+        await removeCartItem(itemId);
+        toast("Item removed");
+      } catch (error) {
+        console.error("removeCartItem error:", error);
+        toast.error("Failed to remove item");
+      }
+    },
+    [buildCart],
+  );
 
-  // ── Update quantity ────────────────────────────────────────────
-  const handleUpdate = useCallback(async (itemId, quantity) => {
-    if (quantity < 1) return handleRemove(itemId);
+  const handleUpdate = useCallback(
+    async (itemId, quantity) => {
+      if (quantity < 1) {
+        handleRemove(itemId);
+        return;
+      }
 
-    setCart((prev) => ({
-      ...prev,
-      ...buildCart(
-        prev.items.map((i) =>
-          i.id === itemId
-            ? { ...i, quantity, subtotal: getCartItemSubtotal(i.product, quantity, i.variant) }
-            : i
-        )
-      ),
-    }));
+      setCart((prev) => ({
+        ...prev,
+        ...buildCart(
+          prev.items.map((item) =>
+            item.id === itemId
+              ? {
+                  ...item,
+                  quantity,
+                  subtotal: getCartItemSubtotal(item.product, quantity, item.variant),
+                }
+              : item,
+          ),
+        ),
+      }));
 
-    try {
-      await updateCartItem(itemId, quantity);
-    } catch (err) {
-      console.error("updateCartItem error:", err);
-      toast.error("Failed to update quantity");
-    }
-  }, [buildCart, handleRemove]);
+      try {
+        await updateCartItem(itemId, quantity);
+      } catch (error) {
+        console.error("updateCartItem error:", error);
+        toast.error("Failed to update quantity");
+      }
+    },
+    [buildCart, handleRemove],
+  );
 
-  // ── Clear (used after successful checkout) ─────────────────────
   const handleClearCart = useCallback(async () => {
     setCart(initialCart);
     localStorage.removeItem(CART_STORAGE_KEY);
+
     try {
-      await import("../api/cart").then(({ clearCart }) => clearCart?.());
+      await clearCart();
     } catch {
-      // Best-effort backend clear
+      // Best-effort backend clear.
     }
   }, []);
 
-  // ── Derived values ─────────────────────────────────────────────
+  const ensureServerCart = useCallback(async () => {
+    let serverCart = null;
+
+    try {
+      serverCart = normalizeCart(await getCart());
+    } catch {
+      serverCart = initialCart;
+    }
+
+    if (serverCart.items.length > 0) {
+      setCart(serverCart);
+      return serverCart;
+    }
+
+    const localCart = getStoredCart();
+    if (!localCart.items.length) return localCart;
+
+    let latestCart = serverCart;
+    for (const item of localCart.items) {
+      const productId = item.product?.id;
+      if (!productId) continue;
+      latestCart = normalizeCart(
+        await addToCart(productId, item.quantity || 1, item.variant?.id),
+      );
+    }
+
+    setCart(latestCart);
+    return latestCart;
+  }, []);
+
   const itemCount = useMemo(
-    () => cart.items.reduce((sum, i) => sum + (i.quantity || 0), 0),
-    [cart.items]
+    () => cart.items.reduce((sum, item) => sum + (item.quantity || 0), 0),
+    [cart.items],
   );
 
   return (
@@ -168,6 +225,7 @@ export const CartProvider = ({ children }) => {
         handleRemove,
         handleUpdate,
         handleClearCart,
+        ensureServerCart,
       }}
     >
       {children}

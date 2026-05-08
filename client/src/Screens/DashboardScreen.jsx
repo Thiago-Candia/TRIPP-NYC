@@ -5,12 +5,15 @@ import ProductsModule from "../Components/dashboard/ProductsModule";
 import InventoryModule from "../Components/dashboard/InventoryModule";
 import OrdersModule from "../Components/dashboard/OrdersModule";
 import CouponsModule from "../Components/dashboard/CouponsModule";
+import DashboardLogin from "../Components/dashboard/DashboardLogin";
+import { DASHBOARD_TABS } from "../constants/dashboard";
 import "../Styles/dashboard.css";
 
 const DashboardScreen = () => {
   const {
     user,
     loadingUser,
+    login,
     logout,
     fetchCurrentUser,
     canManageCatalog,
@@ -28,7 +31,7 @@ const DashboardScreen = () => {
 
   const activeMembership = useMemo(
     () => user?.stores?.find((store) => String(store.store_id) === String(activeStoreId)),
-    [user?.stores, activeStoreId]
+    [user?.stores, activeStoreId],
   );
 
   if (!hasToken) {
@@ -49,6 +52,12 @@ const DashboardScreen = () => {
   }
 
   if (!canManageCatalog) {
+
+    return <DashboardLogin onLogin={login} />;
+  }
+
+  if (user && !canManageCatalog) {
+
     return <Navigate to="/account" replace />;
   }
 
@@ -56,13 +65,20 @@ const DashboardScreen = () => {
     <section className="dashboard-page">
       <header className="dashboard-header">
         <div className="dashboard-header__intro">
-          <h1 className="dashboard-header__title">Dashboard modular</h1>
+          <p className="dashboard-header__eyebrow">TRIPP NYC Admin</p>
+          <h1 className="dashboard-header__title">Dashboard</h1>
           <p className="dashboard-header__meta">
             {user.username} - {activeMembership?.role || user.role || "admin"} - store #{activeStoreId || "-"}
           </p>
         </div>
         <div className="dashboard-header__actions">
           {Boolean(user.stores?.length) && (
+            {user?.username || "Cargando"} - {activeMembership?.role || user?.role || "admin"} - store #
+            {activeStoreId || "-"}
+          </p>
+        </div>
+        <div className="dashboard-header__actions">
+          {Boolean(user?.stores?.length) && (
             <select
               className="dashboard-field dashboard-field--select"
               value={activeStoreId || ""}
@@ -106,6 +122,17 @@ const DashboardScreen = () => {
         >
           Coupons
         </button>
+        {DASHBOARD_TABS.map((dashboardTab) => (
+          <button
+            key={dashboardTab.id}
+            className={`dashboard-tabs__btn ${
+              tab === dashboardTab.id ? "dashboard-tabs__btn--active" : ""
+            }`}
+            onClick={() => setTab(dashboardTab.id)}
+          >
+            {dashboardTab.label}
+          </button>
+        ))}
       </nav>
 
       <div>

@@ -50,7 +50,7 @@ function validateStep(step, form) {
 }
 
 const CheckoutScreen = () => {
-  const { cart, handleClearCart } = useCart();
+  const { cart, ensureServerCart } = useCart();
   const navigate = useNavigate();
 
   const [step, setStep] = useState(0);
@@ -85,6 +85,12 @@ const CheckoutScreen = () => {
     setSubmitting(true);
     setServerError("");
     try {
+      const serverCart = await ensureServerCart();
+      if (!serverCart?.items?.length) {
+        setServerError("Your cart could not be synchronized. Add the product again before checkout.");
+        return;
+      }
+
       const payload = {
         ...form,
         subtotal: subtotal.toFixed(2),
@@ -94,17 +100,24 @@ const CheckoutScreen = () => {
       const data = await createOrder(payload);
 
       if (data.init_point) {
-        await handleClearCart();
         window.location.href = data.init_point;
       } else if (data.order_id) {
-        await handleClearCart();
         navigate(`/order-success?order_id=${data.order_id}`);
       }
     } catch (err) {
       console.error(err);
+      console.error("checkout response", err?.response?.data);
+      const responseData = err?.response?.data;
+      const fieldErrors = responseData && typeof responseData === "object"
+        ? Object.entries(responseData)
+            .filter(([key]) => !["detail", "error"].includes(key))
+            .map(([key, value]) => `${key}: ${Array.isArray(value) ? value.join(", ") : value}`)
+            .join(" | ")
+        : "";
       setServerError(
-        err?.response?.data?.detail ||
-        err?.response?.data?.error ||
+        responseData?.detail ||
+        responseData?.error ||
+        fieldErrors ||
         "There was an error processing your order. Please try again."
       );
     } finally {
@@ -179,7 +192,7 @@ const CheckoutScreen = () => {
               </div>
 
               <p className="checkout__privacy">
-                We'll send your order confirmation to this email.
+                We will send your order confirmation to this email.
               </p>
             </section>
           )}
