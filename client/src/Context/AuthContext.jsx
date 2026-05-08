@@ -68,10 +68,8 @@ export const AuthProvider = ({ children }) => {
       fetchCurrentUser,
       activeStoreId,
       setActiveStore,
-      isAdmin: user?.role === "admin",
-      canManageCatalog:
-        user?.role === "admin" ||
-        Boolean(user?.stores?.some((store) => ["owner", "manager"].includes(store.role))),
+      isAdmin: Boolean(user?.is_staff || user?.is_superuser || user?.role === "admin"),
+      canManageCatalog: Boolean(user?.is_staff || user?.is_superuser || user?.role === "admin"),
     }),
     [user, loadingUser, login, register, logout, fetchCurrentUser, activeStoreId, setActiveStore]
   );

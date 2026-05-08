@@ -12,6 +12,7 @@ import "../Styles/dashboard.css";
 const DashboardScreen = () => {
   const {
     user,
+    loadingUser,
     login,
     logout,
     fetchCurrentUser,
@@ -34,10 +35,29 @@ const DashboardScreen = () => {
   );
 
   if (!hasToken) {
+    return <Navigate to="/account" replace />;
+  }
+
+  if (loadingUser || !user) {
+    return (
+      <section className="dashboard-page">
+        <header className="dashboard-header">
+          <div className="dashboard-header__intro">
+            <h1 className="dashboard-header__title">Validando acceso</h1>
+            <p className="dashboard-header__meta">Cargando permisos de administrador...</p>
+          </div>
+        </header>
+      </section>
+    );
+  }
+
+  if (!canManageCatalog) {
+
     return <DashboardLogin onLogin={login} />;
   }
 
   if (user && !canManageCatalog) {
+
     return <Navigate to="/account" replace />;
   }
 
@@ -48,6 +68,11 @@ const DashboardScreen = () => {
           <p className="dashboard-header__eyebrow">TRIPP NYC Admin</p>
           <h1 className="dashboard-header__title">Dashboard</h1>
           <p className="dashboard-header__meta">
+            {user.username} - {activeMembership?.role || user.role || "admin"} - store #{activeStoreId || "-"}
+          </p>
+        </div>
+        <div className="dashboard-header__actions">
+          {Boolean(user.stores?.length) && (
             {user?.username || "Cargando"} - {activeMembership?.role || user?.role || "admin"} - store #
             {activeStoreId || "-"}
           </p>
@@ -73,6 +98,30 @@ const DashboardScreen = () => {
       </header>
 
       <nav className="dashboard-tabs">
+        <button
+          className={`dashboard-tabs__btn ${tab === "products" ? "dashboard-tabs__btn--active" : ""}`}
+          onClick={() => setTab("products")}
+        >
+          Products
+        </button>
+        <button
+          className={`dashboard-tabs__btn ${tab === "inventory" ? "dashboard-tabs__btn--active" : ""}`}
+          onClick={() => setTab("inventory")}
+        >
+          Inventory
+        </button>
+        <button
+          className={`dashboard-tabs__btn ${tab === "orders" ? "dashboard-tabs__btn--active" : ""}`}
+          onClick={() => setTab("orders")}
+        >
+          Orders
+        </button>
+        <button
+          className={`dashboard-tabs__btn ${tab === "coupons" ? "dashboard-tabs__btn--active" : ""}`}
+          onClick={() => setTab("coupons")}
+        >
+          Coupons
+        </button>
         {DASHBOARD_TABS.map((dashboardTab) => (
           <button
             key={dashboardTab.id}
