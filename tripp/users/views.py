@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from rest_framework import viewsets
+from rest_framework.permissions import IsAdminUser
 from .models import CustomUser
 from .serializer import UserProfileSerializer, CustomUserSerializer, UserAddressSerializer
 
@@ -9,5 +10,6 @@ from .serializer import UserProfileSerializer, CustomUserSerializer, UserAddress
 class UserViewSet(viewsets.ModelViewSet):
     queryset = CustomUser.objects.all()
     serializer_class = CustomUserSerializer
+    permission_classes = [IsAdminUser]
 
 

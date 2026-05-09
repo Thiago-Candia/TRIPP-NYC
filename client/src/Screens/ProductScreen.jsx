@@ -22,7 +22,17 @@ export const ProductScreen = () => {
   const [isFavorite, setIsFavorite] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
+
   useEffect(() => {
+
+    const [product, setProduct] = useState({});
+    const [selectedSize, setSelectedSize] = useState("");
+    const [isFavorite, setIsFavorite] = useState(false);
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const sizes = product.variants?.map(v => v.size) || [];
+
+    useEffect(() => {
+
     const fetchProduct = async () => {
       try {
         const data = await getProductById(id);
@@ -153,6 +163,7 @@ export const ProductScreen = () => {
                 >
                   {selectedSize ? "Add to cart" : "Select a size"}
                 </button>
+
                 <button className="product__action-button product__action-button--secondary">
                   Need Help?
                 </button>
@@ -187,6 +198,114 @@ export const ProductScreen = () => {
               </div>
             </div>
           </section>
+
+            </section>
+            <section className="product__info">
+                <div className="product__header">
+                    <button
+                        className="product__favorite"
+                        onClick={() => setIsFavorite(!isFavorite)}
+                        aria-label="Add to favorites"
+                    >
+                        {isFavorite ? "❤" : "♡"}
+                    </button>
+                    <span className="product__sku">
+                        No. {product.sku || "N/A"}
+                    </span>
+                    <nav className="product__breadcrumb">
+                        <Link to="/" className="product__breadcrumb-link">
+                            Home
+                        </Link>
+                        <span className="product__breadcrumb-separator">
+                            \
+                        </span>
+                        <Link to="/collections" className="product__breadcrumb-link">
+                            New Arrivals Homepage
+                        </Link>
+                    </nav>
+                </div>
+                <div className="product__title-section">
+                    <h1 className="product__title">{product.name}</h1>
+                    <p className="product__price">${Number(product.price).toFixed(2)}</p>
+                </div>
+                <hr className="product__divider" />
+                
+                <div className="product__size-section">
+                    <h2 className="product__size-label">
+                        Size
+                    </h2>
+                    <div className="product__size-grid">
+                        {sizes.length > 0 ? (
+                            sizes.map((size) => (
+                                <button
+                                    key={size}
+                                    className={`product__size-button ${
+                                        selectedSize === size
+                                            ? "product__size-button--selected"
+                                            : ""
+                                    }`}
+                                    onClick={() => setSelectedSize(size)}
+                                >
+                                    {size}
+                                </button>
+                            ))
+                        ) : (
+                            <p>No sizes available</p>
+                        )}
+                    </div>
+                    <div className="product__actions">
+                        <button
+                            className="product__action-button product__action-button--primary"
+                            disabled={!selectedSize}
+                            onClick={() => {
+                                const variant = product.variants?.find(v => v.size === selectedSize);
+                                if (variant) {
+                                    handleAddToCart(product, 1, variant);
+                                }
+                            }}
+                        >
+                            {selectedSize ? "Add to cart" : "Select a size"}
+                        </button>
+                        <button className="product__action-button product__action-button--secondary">
+                            Need Help?
+                        </button>
+                    </div>
+                    <button className="product__size-chart">Size Chart</button>
+                </div>
+                <hr className="product__divider" />
+                <div className="product__description">
+                    <p className="product__description-text">
+                        {product.description ||
+                        "Product description not available."}
+                    </p>
+                    <div className="product__details">
+                        <p className="product__details-item">
+                            <strong>WOMAN IS WEARING X-SMALL</strong>
+                        </p>
+                        <p className="product__details-item">
+                            <strong>MAN IS WEARING MEDIUM</strong>
+                        </p>
+                        <p className="product__details-item">
+                            <strong>SIZING BASED ON MENS FIT</strong>
+                        </p>
+                        <ul className="product__features">
+                            <li className="product__features-item">
+                                - Refer to Size Chart (Based on Mens Sizing)
+                            </li>
+                            <li className="product__features-item">
+                                – Adjustable fit for comfort
+                            </li>
+                            <li className="product__features-item">
+                                – Premium Materials
+                            </li>
+                            <li className="product__features-item">
+                                – Care instructions: See tag for details
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
         </div>
       </main>
       <Footer />

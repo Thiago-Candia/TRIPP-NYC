@@ -1,81 +1,143 @@
 import hashlib
 import hmac
-import json
 import logging
+from decimal import Decimal
 
-import mercadopago
+try:
+    import mercadopago
+except ImportError:
+    mercadopago = None
+
 from django.conf import settings
 from django.db import transaction
-from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import redirect
 from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from cart.models import Cart
+from cart.services import get_or_create_cart
 from .email import send_order_confirmation
 from .models import Order, OrderItem
 from .serializers import CheckoutSerializer, OrderSerializer
 
 logger = logging.getLogger(__name__)
+SHIPPING_FREE_THRESHOLD = Decimal("150.00")
+DEFAULT_SHIPPING_COST = Decimal("12.99")
 
 
-# ─── Helper: get or build MP SDK ────────────────────────────────────────────
+def _join_url(base_url, path):
+    return f"{str(base_url).rstrip('/')}/{path.lstrip('/')}"
+
 
 def get_mp_sdk():
-    return mercadopago.SDK(settings.MERCADOPAGO_ACCESS_TOKEN)
+    if mercadopago is None:
+        raise ValueError("The mercadopago package is not installed.")
+    access_token = getattr(settings, "MERCADOPAGO_ACCESS_TOKEN", "")
+    if not access_token:
+        raise ValueError("MERCADOPAGO_ACCESS_TOKEN is not configured.")
+    return mercadopago.SDK(access_token)
 
-
-# ─── Helper: resolve the cart from the current request ──────────────────────
 
 def _get_cart(request):
-    if request.user.is_authenticated:
-        return Cart.objects.filter(auth_user=request.user).first()
-    session_id = request.session.session_key
-    if session_id:
-        return Cart.objects.filter(session_id=session_id).first()
-    return None
+    return get_or_create_cart(request)
 
 
-# ════════════════════════════════════════════════════════════════════════════
-# POST /api/orders/checkout/
-# ════════════════════════════════════════════════════════════════════════════
+def _get_shipping_cost(subtotal):
+    if subtotal >= SHIPPING_FREE_THRESHOLD:
+        return Decimal("0.00")
+    configured_cost = getattr(settings, "CHECKOUT_SHIPPING_COST", DEFAULT_SHIPPING_COST)
+    return Decimal(str(configured_cost))
+
+
+def _send_confirmation_once(order):
+    if order.confirmation_email_sent:
+        return
+    send_order_confirmation(order)
+    order.confirmation_email_sent = True
+    order.save(update_fields=["confirmation_email_sent", "updated_at"])
+
+
+def _get_webhook_data_id(request):
+    return (
+        request.query_params.get("data.id")
+        or request.query_params.get("id")
+        or request.data.get("data", {}).get("id")
+        or request.data.get("id")
+    )
+
+
+def _is_valid_webhook_signature(request):
+    secret = getattr(settings, "MERCADOPAGO_WEBHOOK_SECRET", "")
+    if not secret:
+        return True
+
+    x_signature = request.headers.get("x-signature", "")
+    x_request_id = request.headers.get("x-request-id", "")
+    data_id = _get_webhook_data_id(request)
+    if not x_signature or not x_request_id or not data_id:
+        return False
+
+    signature_parts = {}
+    for part in x_signature.split(","):
+        key, separator, value = part.strip().partition("=")
+        if separator:
+            signature_parts[key] = value
+
+    ts = signature_parts.get("ts")
+    received_hash = signature_parts.get("v1")
+    if not ts or not received_hash:
+        return False
+
+    manifest = f"id:{data_id};request-id:{x_request_id};ts:{ts};"
+    expected_hash = hmac.new(
+        secret.encode("utf-8"),
+        manifest.encode("utf-8"),
+        hashlib.sha256,
+    ).hexdigest()
+    return hmac.compare_digest(expected_hash, received_hash)
+
 
 class CheckoutView(APIView):
     """
-    1. Validate payload (email, shipping address)
-    2. Read cart items from session / authenticated user
-    3. Create Order + OrderItems in a single transaction
-    4. Create a MercadoPago preference
-    5. Return the init_point URL to the frontend
+    Creates a local pending order and a Mercado Pago Checkout Pro preference.
+    The order is confirmed only by the Mercado Pago webhook.
     """
 
     def post(self, request):
-        # ── 1. Validate payload ──────────────────────────────────
         serializer = CheckoutSerializer(data=request.data)
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         data = serializer.validated_data
-
-        # ── 2. Get cart ─────────────────────────────────────────
         cart = _get_cart(request)
         if not cart or not cart.items.exists():
             return Response(
-                {"error": "Your cart is empty."},
+                {
+                    "error": "Your cart is empty on the server. Add the product again before checkout.",
+                    "code": "server_cart_empty",
+                },
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
         cart_items = list(cart.items.select_related("product", "variant").all())
-
-        # ── 3. Build financials ──────────────────────────────────
         subtotal = sum(item.subtotal for item in cart_items)
-        shipping_cost = 0 if subtotal >= 150 else 12_99  # ARS, or override in settings
+        shipping_cost = _get_shipping_cost(subtotal)
         total = subtotal + shipping_cost
 
-        # ── 4. Create Order in DB ────────────────────────────────
+        try:
+            sdk = get_mp_sdk()
+        except ValueError as exc:
+            logger.error(str(exc))
+            return Response(
+                {"error": "Payment gateway is not configured."},
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
+            )
+
         with transaction.atomic():
             order = Order.objects.create(
+                cart=cart,
                 email=data["email"],
                 first_name=data["first_name"],
                 last_name=data["last_name"],
@@ -94,20 +156,20 @@ class CheckoutView(APIView):
             order_items = []
             for item in cart_items:
                 price = item.variant.final_price if item.variant else item.product.price
-                order_items.append(OrderItem(
-                    order=order,
-                    product=item.product,
-                    variant=item.variant,
-                    name=item.product.name,
-                    sku=item.variant.sku or item.product.sku or "",
-                    price=price,
-                    quantity=item.quantity,
-                    subtotal=item.subtotal,
-                ))
+                sku = item.variant.sku if item.variant else item.product.sku
+                order_items.append(
+                    OrderItem(
+                        order=order,
+                        product=item.product,
+                        variant=item.variant,
+                        name=item.product.name,
+                        sku=sku or "",
+                        price=price,
+                        quantity=item.quantity,
+                        subtotal=item.subtotal,
+                    )
+                )
             OrderItem.objects.bulk_create(order_items)
-
-        # ── 5. Create MercadoPago preference ─────────────────────
-        sdk = get_mp_sdk()
 
         mp_items = [
             {
@@ -120,35 +182,55 @@ class CheckoutView(APIView):
             for oi in order_items
         ]
 
-        if float(shipping_cost) > 0:
-            mp_items.append({
-                "id": "shipping",
-                "title": "Shipping",
-                "quantity": 1,
-                "unit_price": float(shipping_cost),
-                "currency_id": "ARS",
-            })
+        if shipping_cost > 0:
+            mp_items.append(
+                {
+                    "id": "shipping",
+                    "title": "Shipping",
+                    "quantity": 1,
+                    "unit_price": float(shipping_cost),
+                    "currency_id": "ARS",
+                }
+            )
+
+        success_url = _join_url(settings.BACKEND_URL, "/api/orders/return/success/")
+        failure_url = _join_url(settings.BACKEND_URL, "/api/orders/return/failure/")
+        pending_url = _join_url(settings.BACKEND_URL, "/api/orders/return/pending/")
+        webhook_url = _join_url(settings.BACKEND_URL, "/api/orders/webhook/")
 
         preference_data = {
             "items": mp_items,
             "payer": {"email": order.email},
             "back_urls": {
-                "success": f"{settings.FRONTEND_URL}/order-success",
-                "failure": f"{settings.FRONTEND_URL}/checkout",
-                "pending": f"{settings.FRONTEND_URL}/order-success",
+                "success": success_url,
+                "failure": failure_url,
+                "pending": pending_url,
             },
             "auto_return": "approved",
             "external_reference": str(order.id),
-            "notification_url": f"{settings.BACKEND_URL}/api/orders/webhook/",
+            "notification_url": webhook_url,
             "statement_descriptor": "TRIPP NYC",
         }
 
-        preference_response = sdk.preference().create(preference_data)
-
-        if preference_response["status"] not in (200, 201):
-            logger.error(f"MercadoPago error: {preference_response}")
+        try:
+            preference_response = sdk.preference().create(preference_data)
+        except Exception as exc:
+            logger.exception("MercadoPago preference creation failed: %s", exc)
             return Response(
                 {"error": "Could not create payment preference. Please try again."},
+                status=status.HTTP_502_BAD_GATEWAY,
+            )
+
+        if preference_response["status"] not in (200, 201):
+            logger.error("MercadoPago error: %s", preference_response)
+            mp_response = preference_response.get("response", {})
+            return Response(
+                {
+                    "error": "Could not create payment preference. Please try again.",
+                    "mp_status": preference_response.get("status"),
+                    "mp_message": mp_response.get("message") or mp_response.get("error"),
+                    "mp_code": mp_response.get("code"),
+                },
                 status=status.HTTP_502_BAD_GATEWAY,
             )
 
@@ -156,25 +238,15 @@ class CheckoutView(APIView):
         order.mp_preference_id = preference["id"]
         order.save(update_fields=["mp_preference_id"])
 
-        # Clear cart (best-effort — don't fail checkout if this errors)
-        try:
-            cart.clear()
-        except Exception as exc:
-            logger.warning(f"Could not clear cart after checkout: {exc}")
+        return Response(
+            {
+                "order_id": order.id,
+                "init_point": preference["init_point"],
+                "sandbox_init_point": preference.get("sandbox_init_point"),
+            },
+            status=status.HTTP_201_CREATED,
+        )
 
-        # Send confirmation email (non-blocking fail)
-        send_order_confirmation(order)
-
-        return Response({
-            "order_id": order.id,
-            "init_point": preference["init_point"],
-            "sandbox_init_point": preference.get("sandbox_init_point"),
-        }, status=status.HTTP_201_CREATED)
-
-
-# ════════════════════════════════════════════════════════════════════════════
-# GET /api/orders/<pk>/
-# ════════════════════════════════════════════════════════════════════════════
 
 class OrderDetailView(APIView):
     def get(self, request, pk):
@@ -185,70 +257,73 @@ class OrderDetailView(APIView):
         return Response(OrderSerializer(order).data)
 
 
-# ════════════════════════════════════════════════════════════════════════════
-# POST /api/orders/webhook/   (MercadoPago → our server)
-# ════════════════════════════════════════════════════════════════════════════
+class MercadoPagoReturnView(APIView):
+    authentication_classes = []
+    permission_classes = []
+
+    def get(self, request, result):
+        query_string = request.GET.urlencode()
+        if result == "failure":
+            target = _join_url(settings.FRONTEND_URL, "/checkout")
+        else:
+            target = _join_url(settings.FRONTEND_URL, "/order-success")
+
+        if query_string:
+            target = f"{target}?{query_string}"
+
+        return redirect(target)
+
 
 @method_decorator(csrf_exempt, name="dispatch")
 class MercadoPagoWebhookView(APIView):
     """
-    Receives IPN / webhook notifications from MercadoPago.
-
-    MercadoPago sends a POST with topic=payment and id=<payment_id>,
-    then we query the MP API to get the real payment status.
-
-    Signature validation uses MERCADOPAGO_WEBHOOK_SECRET from settings.
+    Receives Mercado Pago webhook notifications and updates order status.
+    Mercado Pago may retry webhooks, so the paid side effects are idempotent.
     """
 
     authentication_classes = []
     permission_classes = []
 
     def post(self, request):
-        # ── Optional: verify MP signature ────────────────────────
-        # In production, set MERCADOPAGO_WEBHOOK_SECRET and uncomment:
-        #
-        # secret = settings.MERCADOPAGO_WEBHOOK_SECRET
-        # x_signature = request.headers.get("x-signature", "")
-        # x_request_id = request.headers.get("x-request-id", "")
-        # data_id = request.query_params.get("data.id", "")
-        # manifest = f"id:{data_id};request-id:{x_request_id};"
-        # expected = hmac.new(secret.encode(), manifest.encode(), hashlib.sha256).hexdigest()
-        # if not hmac.compare_digest(expected, x_signature.split("ts=")[-1].split(",")[0]):
-        #     return Response(status=400)
+        if not _is_valid_webhook_signature(request):
+            logger.warning("Rejected MercadoPago webhook with invalid signature")
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
-        topic = request.query_params.get("topic") or request.data.get("type")
-        payment_id = (
-            request.query_params.get("id")
-            or request.data.get("data", {}).get("id")
+        topic = (
+            request.query_params.get("type")
+            or request.query_params.get("topic")
+            or request.data.get("type")
         )
+        payment_id = _get_webhook_data_id(request)
 
         if topic not in ("payment", "merchant_order") or not payment_id:
             return Response(status=status.HTTP_200_OK)
 
-        sdk = get_mp_sdk()
+        try:
+            sdk = get_mp_sdk()
+        except ValueError as exc:
+            logger.error(str(exc))
+            return Response(status=status.HTTP_200_OK)
 
         try:
             if topic == "payment":
                 payment_info = sdk.payment().get(payment_id)["response"]
                 external_reference = payment_info.get("external_reference")
-                payment_status = payment_info.get("status")  # "approved", "rejected", etc.
+                payment_status = payment_info.get("status")
                 merchant_order_id = str(payment_info.get("order", {}).get("id", ""))
             else:
-                # merchant_order topic
                 mo_info = sdk.merchant_order().get(payment_id)["response"]
                 external_reference = mo_info.get("external_reference")
                 merchant_order_id = str(payment_id)
-                # Check if all payments are approved
                 payments = mo_info.get("payments", [])
                 payment_status = (
                     "approved"
                     if payments and all(p["status"] == "approved" for p in payments)
                     else "pending"
                 )
-
         except Exception as exc:
-            logger.error(f"MP webhook query failed: {exc}")
-            return Response(status=status.HTTP_200_OK)  # Always 200 to MP
+            logger.error("MP webhook query failed: %s", exc)
+            return Response(status=status.HTTP_200_OK)
 
         if not external_reference:
             return Response(status=status.HTTP_200_OK)
@@ -256,11 +331,10 @@ class MercadoPagoWebhookView(APIView):
         try:
             order = Order.objects.get(pk=external_reference)
         except Order.DoesNotExist:
-            logger.warning(f"Webhook: order {external_reference} not found")
+            logger.warning("Webhook: order %s not found", external_reference)
             return Response(status=status.HTTP_200_OK)
 
-        # Map MP status → our status
-        STATUS_MAP = {
+        status_map = {
             "approved": "paid",
             "rejected": "cancelled",
             "cancelled": "cancelled",
@@ -270,8 +344,9 @@ class MercadoPagoWebhookView(APIView):
             "in_process": "pending",
             "authorized": "pending",
         }
-        new_status = STATUS_MAP.get(payment_status, "pending")
+        new_status = status_map.get(payment_status, "pending")
 
+        was_paid = order.status == "paid"
         update_fields = ["updated_at"]
 
         if order.status != new_status:
@@ -287,5 +362,17 @@ class MercadoPagoWebhookView(APIView):
             update_fields.append("mp_merchant_order_id")
 
         order.save(update_fields=update_fields)
+
+        if new_status == "paid" and not was_paid:
+            try:
+                _send_confirmation_once(order)
+            except Exception as exc:
+                logger.error("Post-payment confirmation failed for order #%s: %s", order.id, exc)
+
+            if order.cart_id:
+                try:
+                    order.cart.clear()
+                except Exception as exc:
+                    logger.warning("Could not clear cart for paid order #%s: %s", order.id, exc)
 
         return Response(status=status.HTTP_200_OK)

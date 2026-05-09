@@ -70,7 +70,25 @@ class CartItem(models.Model):
         variant_label = f" ({self.variant})" if self.variant else ""
         return f"{self.quantity} x {self.product.name}{variant_label}"
 
+
     @property
     def subtotal(self):
         price = self.variant.final_price if self.variant else self.product.price
         return price * self.quantity
+
+  quantity = models.PositiveIntegerField(default=1)
+  added_at = models.DateTimeField(auto_now_add=True)
+  class Meta:
+    unique_together = ['cart', 'product', 'variant']
+  def __str__(self):
+    if self.variant:
+      return f"{self.quantity} x {self.product.name} ({self.variant})"
+    return f"{self.quantity} x {self.product.name}"
+    variant_label = f" ({self.variant})" if self.variant else ""
+    return f"{self.quantity} x {self.product.name}{variant_label}"
+  
+  @property
+  def subtotal(self):
+    price = self.variant.final_price if self.variant else self.product.price
+    return price * self.quantity
+
