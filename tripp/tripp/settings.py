@@ -18,7 +18,7 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
-def load_local_env(path):
+def load_local_env(path, override=False):
     if not path.exists():
         return
     for raw_line in path.read_text(encoding="utf-8").splitlines():
@@ -26,10 +26,10 @@ def load_local_env(path):
         if not line or line.startswith("#") or "=" not in line:
             continue
         key, value = line.split("=", 1)
-        os.environ.setdefault(key.strip(), value.strip().strip('"').strip("'"))
-
-
-load_local_env(BASE_DIR / ".env")
+        key = key.strip()
+        value = value.strip().strip('"').strip("'")
+        if override or key not in os.environ:
+            os.environ[key] = value
 
 
 # Quick-start development settings - unsuitable for production
@@ -40,6 +40,8 @@ SECRET_KEY = 'django-insecure-9avau#^!pm(y8mma3g0+=3bwvs48kk0ncq@b)b08y*#2gd+9zc
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+
+load_local_env(BASE_DIR / ".env", override=DEBUG)
 
 ALLOWED_HOSTS = [
     "localhost",

@@ -31,6 +31,34 @@ def _join_url(base_url, path):
     return f"{str(base_url).rstrip('/')}/{path.lstrip('/')}"
 
 
+def _mp_error_response(preference_response):
+    mp_response = preference_response.get("response", {})
+    mp_status = preference_response.get("status")
+    mp_message = mp_response.get("message") or mp_response.get("error")
+    mp_code = mp_response.get("code")
+
+    if mp_status == 401 or mp_code == "unauthorized":
+        return Response(
+            {
+                "error": "Mercado Pago access token is invalid. Replace MERCADOPAGO_ACCESS_TOKEN and restart Django.",
+                "mp_status": mp_status,
+                "mp_message": mp_message,
+                "mp_code": mp_code,
+            },
+            status=status.HTTP_503_SERVICE_UNAVAILABLE,
+        )
+
+    return Response(
+        {
+            "error": "Could not create payment preference. Please try again.",
+            "mp_status": mp_status,
+            "mp_message": mp_message,
+            "mp_code": mp_code,
+        },
+        status=status.HTTP_502_BAD_GATEWAY,
+    )
+
+
 def get_mp_sdk():
     if mercadopago is None:
         raise ValueError("The mercadopago package is not installed.")
@@ -223,16 +251,7 @@ class CheckoutView(APIView):
 
         if preference_response["status"] not in (200, 201):
             logger.error("MercadoPago error: %s", preference_response)
-            mp_response = preference_response.get("response", {})
-            return Response(
-                {
-                    "error": "Could not create payment preference. Please try again.",
-                    "mp_status": preference_response.get("status"),
-                    "mp_message": mp_response.get("message") or mp_response.get("error"),
-                    "mp_code": mp_response.get("code"),
-                },
-                status=status.HTTP_502_BAD_GATEWAY,
-            )
+            return _mp_error_response(preference_response)
 
         preference = preference_response["response"]
         order.mp_preference_id = preference["id"]
