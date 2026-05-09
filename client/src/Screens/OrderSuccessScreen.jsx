@@ -98,6 +98,14 @@ const OrderSuccessScreen = () => {
 
         {!loading && order && (
           <div className="order-success__card">
+
+            <div className="order-success__icon">✓</div>
+            <h1 className="order-success__title">Order Confirmed!</h1>
+            <p className="order-success__sub">
+              Thank you, <strong>{order.first_name}</strong>! We have sent a confirmation to{" "}
+              <strong>{order.email}</strong>.
+            </p>
+
             {(() => {
               const copy = getStatusCopy();
               return (
@@ -108,6 +116,7 @@ const OrderSuccessScreen = () => {
                 </>
               );
             })()}
+
 
             <div className="order-success__meta">
               <span className="order-success__meta-label">Order #</span>

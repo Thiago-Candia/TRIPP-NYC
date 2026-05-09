@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import "../Styles/styles.css";
-import gram1 from "../assets/Img/gram1.jpg";
-import gram2 from "../assets/Img/gram2.jpg";
-import gram3 from "../assets/Img/gram3.jpg";
-import gram4 from "../assets/Img/gram4.jpg";
+import gram1 from "../Assets/Img/gram1.jpg";
+import gram2 from "../Assets/Img/gram2.jpg";
+import gram3 from "../Assets/Img/gram3.jpg";
+import gram4 from "../Assets/Img/gram4.jpg";
 import useModal from "../Hooks/modalhook";
 import ModalGram from "./ModalGram";
 

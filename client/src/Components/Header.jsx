@@ -7,37 +7,38 @@ const Header = ({
   onCloseHeader = () => {},
 }) => {
   return (
-    <div className="header__banner">
+    <div className="header-banner">
       {isSearchOpen ? (
-        <div className="header__search">
+        <div className="header-banner__search">
           <input
-            className="input__header__search text "
+            className="header-banner__search-input"
             value={searchText}
             type="text"
-            onChange={(e) => setSearchText(e.target.value)}
-            name=""
-            id=""
+            onChange={(event) => setSearchText(event.target.value)}
+            aria-label="Search products"
           />
           <button
-            className="btn-config text btn-close-search"
+            className="header-banner__close"
             onClick={onCloseHeader}
+            aria-label="Close search"
           >
             X
           </button>
         </div>
       ) : (
         <>
-          <div className="header-container">
-            <span className="text">
-              EXTRA 50% OFF SALE ITEMS W/ CODE: XTRA50 ★ FREE U.S. SHIPPING FOR
-              ORDERS $150+
+          <div className="header-banner__message-wrap">
+            <span className="header-banner__message">
+              EXTRA 50% OFF SALE ITEMS W/ CODE: XTRA50 - FREE U.S. SHIPPING FOR ORDERS $150+
             </span>
           </div>
-          <div>
-            <span className="text btn-config" onClick={onCloseHeader}>
-              X
-            </span>
-          </div>
+          <button
+            className="header-banner__close"
+            onClick={onCloseHeader}
+            aria-label="Close announcement"
+          >
+            X
+          </button>
         </>
       )}
     </div>

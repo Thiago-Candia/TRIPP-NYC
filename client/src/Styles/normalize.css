@@ -43,12 +43,3 @@ body {
   --product-font-size-3xl: 2.5rem;
 }
 
-.btn-config {
-  border: none;
-  background-color: transparent;
-  cursor: pointer;
-}
-
-.text {
-  color: #f1f1f1;
-}

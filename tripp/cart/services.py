@@ -3,8 +3,12 @@ from users.models import CustomUser
 
 
 def get_or_create_cart(request):
-    if request.user.is_authenticated and isinstance(request.user, CustomUser):
-        cart, _ = Cart.objects.get_or_create(user=request.user)
+    user = getattr(request, "user", None)
+    if user and user.is_authenticated:
+        if isinstance(user, CustomUser):
+            cart, _ = Cart.objects.get_or_create(user=user)
+        else:
+            cart, _ = Cart.objects.get_or_create(auth_user=user)
         return cart
 
     session_id = request.session.session_key
