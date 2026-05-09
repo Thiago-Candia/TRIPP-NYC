@@ -1,8 +1,8 @@
 import React from "react";
 import "../Styles/styles.css";
 import { Link } from "react-router-dom";
-import intro from "../assets/Img/intro.jpg";
-import intro2 from "../assets/Img/intro2.jpg";
+import intro from "../Assets/Img/intro.jpg";
+import intro2 from "../Assets/Img/intro2.jpg";
 import { useProductContext } from "../Context/ProductContext.jsx";
 import ProductCard from "./ProductCard.jsx";
 

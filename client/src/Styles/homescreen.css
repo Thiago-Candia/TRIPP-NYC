@@ -85,7 +85,7 @@
 
 /* FOOTER BLOCK */
 
-.footer-container {
+.site-footer {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -104,7 +104,7 @@
   width: 100%;
 }
 
-.footer-container__content {
+.site-footer__content {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -112,27 +112,27 @@
   text-align: center;
 }
 
-.footer-container__text {
+.site-footer__text {
   margin: 5px 0;
   color: #fff;
   font-size: 14px;
 }
 
-.footer__container__social__links {
+.site-footer__social-links {
   display: flex;
   gap: 25px;
   list-style: none;
   margin-top: 15px;
 }
 
-.footer__container__link .footer__link {
+.site-footer__link {
   color: #fff;
   font-weight: 600;
   text-decoration: none;
   transition: opacity 0.3s ease;
 }
 
-.footer__container__link .footer__link:hover {
+.site-footer__link:hover {
   opacity: 0.7;
 }
 

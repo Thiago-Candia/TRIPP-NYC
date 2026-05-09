@@ -2,6 +2,7 @@ import React, { createContext, useCallback, useContext, useEffect, useMemo, useS
 import toast from "react-hot-toast";
 import {
   addToCart,
+  clearCart,
   getCart,
   removeCartItem,
   updateCartItem,
@@ -30,19 +31,17 @@ export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState(getStoredCart);
   const [loading, setLoading] = useState(true);
 
-  // Persist to localStorage on every change
   useEffect(() => {
     localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
   }, [cart]);
 
-  // Sync from backend on mount
   useEffect(() => {
     const syncCart = async () => {
       try {
         const data = await getCart();
         setCart(normalizeCart(data));
       } catch {
-        // Backend unavailable — fall back to localStorage silently
+        // Backend unavailable: keep the local cart.
       } finally {
         setLoading(false);
       }
@@ -50,26 +49,23 @@ export const CartProvider = ({ children }) => {
     syncCart();
   }, []);
 
-  // Helper: recompute totals from items array
   const buildCart = useCallback((items) => ({
     items,
     ...calculateCartTotals(items),
   }), []);
 
-  // ── Add ────────────────────────────────────────────────────────
   const handleAddToCart = useCallback(async (product, quantity = 1, variant = null) => {
-    // Optimistic update
     setCart((prev) => {
-      const existing = prev.items.find((i) => isSameCartItem(i, product, variant));
+      const existing = prev.items.find((item) => isSameCartItem(item, product, variant));
       const updatedItems = existing
-        ? prev.items.map((i) =>
-            i.id === existing.id
+        ? prev.items.map((item) =>
+            item.id === existing.id
               ? {
-                  ...i,
-                  quantity: i.quantity + quantity,
-                  subtotal: getCartItemSubtotal(product, i.quantity + quantity, variant),
+                  ...item,
+                  quantity: item.quantity + quantity,
+                  subtotal: getCartItemSubtotal(product, item.quantity + quantity, variant),
                 }
-              : i
+              : item
           )
         : [
             ...prev.items,
@@ -81,6 +77,7 @@ export const CartProvider = ({ children }) => {
               subtotal: getCartItemSubtotal(product, quantity, variant),
             },
           ];
+
       return { ...prev, ...buildCart(updatedItems) };
     });
 
@@ -88,12 +85,12 @@ export const CartProvider = ({ children }) => {
       const updatedCart = await toast.promise(
         addToCart(product.id, quantity, variant?.id),
         {
-          loading: "Adding to cart…",
+          loading: "Adding to cart...",
           success: `${product.name} added!`,
           error: "Failed to add product",
         }
       );
-      // Replace optimistic state with real backend IDs
+
       if (updatedCart?.items) {
         setCart(normalizeCart(updatedCart));
       }
@@ -102,11 +99,10 @@ export const CartProvider = ({ children }) => {
     }
   }, [buildCart]);
 
-  // ── Remove ─────────────────────────────────────────────────────
   const handleRemove = useCallback(async (itemId) => {
     setCart((prev) => ({
       ...prev,
-      ...buildCart(prev.items.filter((i) => i.id !== itemId)),
+      ...buildCart(prev.items.filter((item) => item.id !== itemId)),
     }));
 
     try {
@@ -118,17 +114,19 @@ export const CartProvider = ({ children }) => {
     }
   }, [buildCart]);
 
-  // ── Update quantity ────────────────────────────────────────────
   const handleUpdate = useCallback(async (itemId, quantity) => {
-    if (quantity < 1) return handleRemove(itemId);
+    if (quantity < 1) {
+      await handleRemove(itemId);
+      return;
+    }
 
     setCart((prev) => ({
       ...prev,
       ...buildCart(
-        prev.items.map((i) =>
-          i.id === itemId
-            ? { ...i, quantity, subtotal: getCartItemSubtotal(i.product, quantity, i.variant) }
-            : i
+        prev.items.map((item) =>
+          item.id === itemId
+            ? { ...item, quantity, subtotal: getCartItemSubtotal(item.product, quantity, item.variant) }
+            : item
         )
       ),
     }));
@@ -141,38 +139,33 @@ export const CartProvider = ({ children }) => {
     }
   }, [buildCart, handleRemove]);
 
-  // ── Clear (used after successful checkout) ─────────────────────
   const handleClearCart = useCallback(async () => {
     setCart(initialCart);
     localStorage.removeItem(CART_STORAGE_KEY);
+
     try {
-      await import("../api/cart").then(({ clearCart }) => clearCart?.());
+      await clearCart();
     } catch {
-      // Best-effort backend clear
+      // Best-effort backend clear.
     }
   }, []);
 
-  // ── Derived values ─────────────────────────────────────────────
   const itemCount = useMemo(
-    () => cart.items.reduce((sum, i) => sum + (i.quantity || 0), 0),
+    () => cart.items.reduce((sum, item) => sum + (item.quantity || 0), 0),
     [cart.items]
   );
 
-  return (
-    <CartContext.Provider
-      value={{
-        cart,
-        loading,
-        itemCount,
-        handleAddToCart,
-        handleRemove,
-        handleUpdate,
-        handleClearCart,
-      }}
-    >
-      {children}
-    </CartContext.Provider>
-  );
+  const value = useMemo(() => ({
+    cart,
+    loading,
+    itemCount,
+    handleAddToCart,
+    handleRemove,
+    handleUpdate,
+    handleClearCart,
+  }), [cart, loading, itemCount, handleAddToCart, handleRemove, handleUpdate, handleClearCart]);
+
+  return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 };
 
 export const useCart = () => useContext(CartContext);
