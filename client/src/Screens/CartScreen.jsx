@@ -1,53 +1,73 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { useCart } from "../Context/CartContext";
 import "../Styles/cart.css";
-import { formatCurrency } from "../utils/productUtils";
+import { formatCurrency, getProductImages } from "../utils/productUtils";
 
 const CartScreen = () => {
-
-
-  const { cart , handleRemove, handleUpdate } = useCart();
+  const { cart, handleRemove, handleUpdate } = useCart();
 
   if (!cart || !cart.items || cart.items.length === 0) {
-    return <div className="cart-empty">Tu carrito está vacío.</div>;
+    return <div className="cart-empty">Tu carrito esta vacio.</div>;
   }
 
   return (
-    <div className="cart-container">
-      <h2 className="cart-title">Carrito de Compras</h2>
-      <div className="cart-items-list">
+    <main className="cart-page">
+      <h2 className="cart-page__title">Carrito de Compras</h2>
+
+      <div className="cart-page__items">
         {cart.items.map((item) => (
-          <div key={item.id} className="cart-item">
-            <div className="cart-item-info">
-              <span className="cart-item-name">{item.product.name}</span>
+          <article key={item.id} className="cart-page__item">
+            <Link
+              to={`/collections/product/${item.product.id}`}
+              className="cart-page__image-link"
+              aria-label={`Ver ${item.product.name}`}
+            >
+              <img
+                src={getProductImages(item.product)[0]}
+                alt={item.product.name}
+                className="cart-page__image"
+              />
+            </Link>
+
+            <div className="cart-page__info">
+              <span className="cart-page__name">{item.product.name}</span>
               {item.variant && (
-                <span className="cart-item-variant">
+                <span className="cart-page__variant">
                   Variante: {item.variant.size || item.variant.name}
                 </span>
               )}
             </div>
-            <div className="cart-item-actions">
+
+            <div className="cart-page__actions">
               <input
-                className="cart-item-actions__input"
+                className="cart-page__quantity"
                 type="number"
                 min={1}
                 value={item.quantity}
-                onChange={e => handleUpdate(item.id, Number(e.target.value))}
+                onChange={(event) => handleUpdate(item.id, Number(event.target.value))}
               />
-              <button className="cart-item-actions__remove-btn" onClick={() => handleRemove(item.id)}>Eliminar</button>
+              <button className="cart-page__remove" onClick={() => handleRemove(item.id)}>
+                Eliminar
+              </button>
             </div>
-            <div className="cart-item-subtotal">
-              Subtotal: {formatCurrency(item.subtotal)}
-            </div>
-          </div>
+
+            <div className="cart-page__subtotal">Subtotal: {formatCurrency(item.subtotal)}</div>
+          </article>
         ))}
       </div>
-      <div className="cart-summary">
-        <div>Total de productos: {cart.total_items}</div>
-        <div>Subtotal: {formatCurrency(cart.subtotal)}</div>
-        <div>Total: {formatCurrency(cart.total)}</div>
+
+      <div className="cart-page__summary">
+        <div className="cart-page__summary-lines">
+          <div>Total de productos: {cart.total_items}</div>
+          <div>Subtotal: {formatCurrency(cart.subtotal)}</div>
+          <div>Total: {formatCurrency(cart.total)}</div>
+        </div>
+        <Link to="/checkout" className="cart-page__checkout">
+          Checkout
+        </Link>
       </div>
-    </div>
+    </main>
   );
 };
 

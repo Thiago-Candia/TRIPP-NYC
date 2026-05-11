@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { useCart } from "../Context/CartContext";
 import { Link, useNavigate } from "react-router-dom";
 import "../Styles/cart-side-bar.css";
+import { getProductImages } from "../utils/productUtils";
 
 const CartSidebar = ({ isOpen, onClose }) => {
   const { cart, itemCount, handleRemove, handleUpdate } = useCart();
@@ -60,9 +61,9 @@ const CartSidebar = ({ isOpen, onClose }) => {
               <div key={item.id} className="cart-item">
                 {/* Thumbnail */}
                 <div className="cart-item__img-box">
-                  {item.product?.primary_image ? (
+                  {getProductImages(item.product)[0] ? (
                     <img
-                      src={item.product.primary_image}
+                      src={getProductImages(item.product)[0]}
                       alt={item.product.name}
                       className="cart-item__image"
                     />
