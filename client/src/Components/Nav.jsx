@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Icons } from "../Assets/Icons/Icons";
 import bag from "../Assets/Img/bag.png";
@@ -33,26 +33,72 @@ const NAV_SECTIONS = [
 
 const formatNavLabel = (label) => label.replaceAll("-", " ");
 
-const Nav = ({ onSearchClick = () => {} }) => {
+const Nav = ({ onSearchClick = () => {}, disableAutoHide = false }) => {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [activeMobileSection, setActiveMobileSection] = useState(null);
+  const [isHidden, setIsHidden] = useState(false);
   const { itemCount } = useCart();
+
+  useEffect(() => {
+    if (disableAutoHide) return undefined;
+
+    let lastScrollY = window.scrollY;
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      const isScrollingDown = currentScrollY > lastScrollY && currentScrollY > 80;
+
+      setIsHidden(isScrollingDown);
+      lastScrollY = currentScrollY;
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [disableAutoHide]);
 
   const handleOpenSearch = () => {
     setIsSearchOpen(true);
+    setIsMenuOpen(false);
+    setActiveMobileSection(null);
     onSearchClick();
   };
 
-  return (
-    <header className="header">
-      <nav className="nav">
-        <div className="nav__menu">
-          <ul className="nav__list">
+  const handleCloseMenu = () => {
+    setIsMenuOpen(false);
+    setActiveMobileSection(null);
+  };
 
+  const handleToggleMenu = () => {
+    setIsMenuOpen((current) => {
+      if (current) setActiveMobileSection(null);
+      return !current;
+    });
+  };
+
+  const activeSection = NAV_SECTIONS.find((section) => section.label === activeMobileSection);
+
+  return (
+    <header className={`header ${isHidden ? "header--hidden" : ""}`}>
+      <nav className="nav">
+        <button
+          className={`nav__hamburger ${isMenuOpen ? "nav__hamburger--open" : ""}`}
+          type="button"
+          onClick={handleToggleMenu}
+          aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+          aria-expanded={isMenuOpen}
+        >
+          <span className="nav__hamburger-line" />
+          <span className="nav__hamburger-line" />
+          <span className="nav__hamburger-line" />
+        </button>
+
+        <div className={`nav__menu ${isMenuOpen ? "nav__menu--open" : ""}`}>
+          <ul className="nav__list nav__list--desktop">
             {NAV_SECTIONS.map((section) => (
               <li className="nav__item" key={section.label}>
                 <div className="nav__dropdown">
-                  <Link to={section.href} className="nav__link">
+                  <Link to={section.href} className="nav__link" onClick={handleCloseMenu}>
                     <span className="nav__text">{section.label}</span>
                   </Link>
                   {section.items.length > 0 && (
@@ -62,6 +108,7 @@ const Nav = ({ onSearchClick = () => {} }) => {
                           <Link
                             to={`/collections/${section.label}/${item}`}
                             className="nav__submenu-link"
+                            onClick={handleCloseMenu}
                           >
                             <span className="nav__submenu-text">{formatNavLabel(item)}</span>
                           </Link>
@@ -72,176 +119,65 @@ const Nav = ({ onSearchClick = () => {} }) => {
                 </div>
               </li>
             ))}
-
-            <li className="nav__item">
-              <div className="nav__dropdown">
-                <Link to="/" className="nav__link">
-                  <span className="nav__text">women</span>
-                </Link>
-                <ul className="nav__submenu">
-                  <li className="nav__submenu-item">
-                    <Link to="/collections/women/new-arrivals" className="nav__submenu-link">
-                      <span className="nav__submenu-text">new arrivals</span>
-                    </Link>
-                  </li>
-                  <li className="nav__submenu-item">
-                    <Link to="/collections/women/face-covers" className="nav__submenu-link">
-                      <span className="nav__submenu-text">face covers</span>
-                    </Link>
-                  </li>
-                  <li className="nav__submenu-item">
-                    <Link to="/collections/women/bottoms" className="nav__submenu-link">
-                      <span className="nav__submenu-text">bottoms</span>
-                    </Link>
-                  </li>
-                  <li className="nav__submenu-item">
-                    <Link to="/collections/women/top" className="nav__submenu-link">
-                      <span className="nav__submenu-text">top</span>
-                    </Link>
-                  </li>
-                  <li className="nav__submenu-item">
-                    <Link to="/collections/women/dresses" className="nav__submenu-link">
-                      <span className="nav__submenu-text">dresses</span>
-                    </Link>
-                  </li>
-                  <li className="nav__submenu-item">
-                    <Link to="/collections/women/outwear" className="nav__submenu-link">
-                      <span className="nav__submenu-text">outwear</span>
-                    </Link>
-                  </li>
-                  <li className="nav__submenu-item">
-                    <Link to="/collections/women/plus-size" className="nav__submenu-link">
-                      <span className="nav__submenu-text">plus size</span>
-                    </Link>
-                  </li>
-                  <li className="nav__submenu-item">
-                    <Link to="/collections/women/accessories" className="nav__submenu-link">
-                      <span className="nav__submenu-text">accessories</span>
-                    </Link>
-                  </li>
-                  <li className="nav__submenu-item">
-                    <Link to="/collections/women/sale" className="nav__submenu-link">
-                      <span className="nav__submenu-text">sale</span>
-                    </Link>
-                  </li>
-                </ul>
-              </div>
-            </li>
-
-            <li className="nav__item">
-              <div className="nav__dropdown">
-                <Link to="/" className="nav__link">
-                  <span className="nav__text">men</span>
-                </Link>
-                <ul className="nav__submenu">
-                  <li className="nav__submenu-item">
-                    <Link to="/collections/men/new-arrivals" className="nav__submenu-link">
-                      <span className="nav__submenu-text">new arrivals</span>
-                    </Link>
-                  </li>
-                  <li className="nav__submenu-item">
-                    <Link to="/collections/men/face-covers" className="nav__submenu-link">
-                      <span className="nav__submenu-text">face covers</span>
-                    </Link>
-                  </li>
-                  <li className="nav__submenu-item">
-                    <Link to="/collections/men/bottoms" className="nav__submenu-link">
-                      <span className="nav__submenu-text">bottoms</span>
-                    </Link>
-                  </li>
-                  <li className="nav__submenu-item">
-                    <Link to="/collections/men/top" className="nav__submenu-link">
-                      <span className="nav__submenu-text">top</span>
-                    </Link>
-                  </li>
-                  <li className="nav__submenu-item">
-                    <Link to="/collections/men/dresses" className="nav__submenu-link">
-                      <span className="nav__submenu-text">dresses</span>
-                    </Link>
-                  </li>
-                  <li className="nav__submenu-item">
-                    <Link to="/collections/men/outwear" className="nav__submenu-link">
-                      <span className="nav__submenu-text">outwear</span>
-                    </Link>
-                  </li>
-                  <li className="nav__submenu-item">
-                    <Link to="/collections/men/plus-size" className="nav__submenu-link">
-                      <span className="nav__submenu-text">plus size</span>
-                    </Link>
-                  </li>
-                  <li className="nav__submenu-item">
-                    <Link to="/collections/men/accessories" className="nav__submenu-link">
-                      <span className="nav__submenu-text">accessories</span>
-                    </Link>
-                  </li>
-                  <li className="nav__submenu-item">
-                    <Link to="/collections/men/sale" className="nav__submenu-link">
-                      <span className="nav__submenu-text">sale</span>
-                    </Link>
-                  </li>
-                </ul>
-              </div>
-            </li>
-
-            <li className="nav__item">
-              <div className="nav__dropdown">
-                <Link to="/" className="nav__link">
-                  <span className="nav__text">darkstreet</span>
-                </Link>
-                <ul className="nav__submenu">
-                  <li className="nav__submenu-item">
-                    <Link to="/collections/darkstreet/new-arrivals" className="nav__submenu-link">
-                      <span className="nav__submenu-text">new arrivals</span>
-                    </Link>
-                  </li>
-                  <li className="nav__submenu-item">
-                    <Link to="/collections/darkstreet/face-covers" className="nav__submenu-link">
-                      <span className="nav__submenu-text">face covers</span>
-                    </Link>
-                  </li>
-                  <li className="nav__submenu-item">
-                    <Link to="/collections/darkstreet/bottoms" className="nav__submenu-link">
-                      <span className="nav__submenu-text">bottoms</span>
-                    </Link>
-                  </li>
-                  <li className="nav__submenu-item">
-                    <Link to="/collections/darkstreet/top" className="nav__submenu-link">
-                      <span className="nav__submenu-text">top</span>
-                    </Link>
-                  </li>
-                  <li className="nav__submenu-item">
-                    <Link to="/collections/darkstreet/dresses" className="nav__submenu-link">
-                      <span className="nav__submenu-text">dresses</span>
-                    </Link>
-                  </li>
-                  <li className="nav__submenu-item">
-                    <Link to="/collections/darkstreet/outwear" className="nav__submenu-link">
-                      <span className="nav__submenu-text">outwear</span>
-                    </Link>
-                  </li>
-                  <li className="nav__submenu-item">
-                    <Link to="/collections/darkstreet/plus-size" className="nav__submenu-link">
-                      <span className="nav__submenu-text">plus size</span>
-                    </Link>
-                  </li>
-                  <li className="nav__submenu-item">
-                    <Link to="/collections/darkstreet/accessories" className="nav__submenu-link">
-                      <span className="nav__submenu-text">accessories</span>
-                    </Link>
-                  </li>
-                </ul>
-              </div>
-            </li>
-
-            <li className="nav__item">
-              <div className="nav__dropdown">
-                <Link to="/sale" className="nav__link">
-                  <span className="nav__text">sale</span>
-                </Link>
-              </div>
-            </li>
-
           </ul>
+
+          <div className="nav__mobile-menu">
+            {!activeSection && (
+              <ul className="nav__mobile-list">
+                {NAV_SECTIONS.map((section) => (
+                  <li className="nav__mobile-item" key={section.label}>
+                    {section.items.length > 0 ? (
+                      <button
+                        className="nav__mobile-link nav__link"
+                        type="button"
+                        onClick={() => setActiveMobileSection(section.label)}
+                      >
+                        <span className="nav__mobile-text nav__text">{section.label}</span>
+                        <span className="nav__mobile-arrow" aria-hidden="true">
+                          {"->"}
+                        </span>
+                      </button>
+                    ) : (
+                      <Link
+                        to={section.href}
+                        className="nav__mobile-link nav__link"
+                        onClick={handleCloseMenu}
+                      >
+                        <span className="nav__mobile-text nav__text">{section.label}</span>
+                      </Link>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            {activeSection && (
+              <div className="nav__mobile-panel">
+                <button
+                  className="nav__mobile-back"
+                  type="button"
+                  onClick={() => setActiveMobileSection(null)}
+                >
+                  <span aria-hidden="true">{"<-"}</span>
+                  <span>{formatNavLabel(activeSection.label)}</span>
+                </button>
+
+                <ul className="nav__mobile-sublist">
+                  {activeSection.items.map((item) => (
+                    <li className="nav__mobile-subitem" key={item}>
+                      <Link
+                        to={`/collections/${activeSection.label}/${item}`}
+                        className="nav__mobile-sublink"
+                        onClick={handleCloseMenu}
+                      >
+                        {formatNavLabel(item)}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="nav__logo">

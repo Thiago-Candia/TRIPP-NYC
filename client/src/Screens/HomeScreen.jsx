@@ -16,12 +16,14 @@ const HomeScreen = () => {
     const [show, setShow] = useState(true);
 
     useEffect(() => {
-    let lastScroll = 0;
+    let lastScroll = window.scrollY;
     const handleScroll = () => {
         const currentScroll = window.scrollY;
         if (currentScroll < 10) {
-        setShow(false);
+        setShow(true);
         } else if (currentScroll > lastScroll) {
+            setShow(false);
+        } else {
             setShow(true);
         }
         lastScroll = currentScroll;
@@ -51,6 +53,7 @@ const HomeScreen = () => {
           />
         )}
         <Nav
+          disableAutoHide
           onSearchClick={() => {
             setIsSearch(true);
             setShowHeader(true);
