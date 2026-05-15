@@ -14,13 +14,13 @@ class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = [
-            "id", "email", "first_name", "last_name", "phone",
+            "id", "user", "email", "first_name", "last_name", "phone",
             "address_line1", "address_line2", "city", "state", "zip_code", "country",
             "subtotal", "shipping_cost", "total",
             "status", "mp_preference_id", "mp_payment_id",
             "items", "created_at",
         ]
-        read_only_fields = ["id", "status", "mp_preference_id", "mp_payment_id", "created_at"]
+        read_only_fields = ["id", "user", "status", "mp_preference_id", "mp_payment_id", "created_at"]
 
 
 class CheckoutSerializer(serializers.Serializer):

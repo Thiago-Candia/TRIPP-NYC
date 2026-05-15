@@ -1,3 +1,8 @@
+const formatTablePrice = (value) => {
+  const numericPrice = Number(String(value ?? "").replace(",", "."));
+  return Number.isFinite(numericPrice) ? `$${numericPrice.toFixed(2)}` : "-";
+};
+
 const ProductTable = ({
   products,
   totalProducts,
@@ -39,15 +44,19 @@ const ProductTable = ({
             {products.map((product) => (
               <tr className="dashboard-table__row" key={product.id}>
                 <td className="dashboard-table__td dashboard-product-cell">
-                  {product.primary_image && (
-                    <img src={product.primary_image} alt={product.name} loading="lazy" />
-                  )}
-                  <div>
-                    <strong>{product.name}</strong>
-                    <span>{product.sku || "Sin SKU"}</span>
+                  <div className="dashboard-product-cell__inner">
+                    {product.primary_image && (
+                      <img src={product.primary_image} alt={product.name} loading="lazy" />
+                    )}
+                    <div className="dashboard-product-cell__text">
+                      <strong>{product.name}</strong>
+                      <span>{product.sku || "Sin SKU"}</span>
+                    </div>
                   </div>
                 </td>
-                <td className="dashboard-table__td">${product.price}</td>
+                <td className="dashboard-table__td dashboard-table__td--price">
+                  <span className="dashboard-table__price">{formatTablePrice(product.price)}</span>
+                </td>
                 <td className="dashboard-table__td">{product.stock}</td>
                 <td className="dashboard-table__td">
                   <span className={`status-pill ${product.is_active ? "status-pill--active" : ""}`}>

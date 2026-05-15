@@ -30,12 +30,23 @@
   flex-direction: column;
   z-index: 1200;
   transform: translateX(100%);
-  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  visibility: hidden;
+  pointer-events: none;
+  contain: layout paint;
+  transition:
+    transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+    visibility 0s linear 0.35s;
   overflow: hidden;
+  overscroll-behavior: contain;
 }
 
 .search-drawer--open {
   transform: translateX(0);
+  visibility: visible;
+  pointer-events: auto;
+  transition:
+    transform 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+    visibility 0s;
 }
 
 /* ── Header (input row) ── */
@@ -100,11 +111,13 @@
 /* ── Body (scrollable content) ── */
 .search-drawer__body {
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
   padding: 24px 20px 0;
   display: flex;
   flex-direction: column;
   gap: 24px;
+  overscroll-behavior: contain;
 }
 
 /* Section labels */

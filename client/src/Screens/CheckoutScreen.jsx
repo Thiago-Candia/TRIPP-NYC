@@ -102,7 +102,7 @@ const CheckoutScreen = () => {
       if (data.init_point) {
         window.location.href = data.init_point;
       } else if (data.order_id) {
-        navigate(`/order-success?order_id=${data.order_id}`);
+        navigate(`/checkout/success?order_id=${data.order_id}`);
       }
     } catch (err) {
       console.error(err);

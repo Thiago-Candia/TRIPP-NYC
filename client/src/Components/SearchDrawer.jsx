@@ -77,15 +77,17 @@ const SearchDrawer = ({ isOpen, onClose }) => {
     if (query.trim()) handleViewAll();
   };
 
+  if (!isOpen) return null;
+
   return (
     <>
       <div
-        className={`search-drawer__overlay ${isOpen ? "search-drawer__overlay--visible" : ""}`}
+        className="search-drawer__overlay search-drawer__overlay--visible"
         onClick={onClose}
         aria-hidden="true"
       />
       <aside
-        className={`search-drawer ${isOpen ? "search-drawer--open" : ""}`}
+        className="search-drawer search-drawer--open"
         role="dialog"
         aria-modal="true"
         aria-label="Search"

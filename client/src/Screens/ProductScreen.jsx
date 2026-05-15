@@ -1,8 +1,9 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { Nav } from "../Components";
 import Footer from "../Components/Footer";
 import Header from "../Components/Header";
+import { Icons } from "../Assets/Icons/Icons.jsx";
 import { getProductById } from "../api/products.js";
 import { useCart } from "../Context/CartContext.jsx";
 import "../Styles/product-screen.css";
@@ -10,29 +11,59 @@ import "../Styles/product-screen.css";
 const getImageUrl = (imgPath) => {
   if (!imgPath) return "";
   if (imgPath.startsWith("http") || imgPath.startsWith("data:")) return imgPath;
-  return `${window.location.origin}${imgPath.startsWith("/") ? "" : "/"}${imgPath}`;
-};
+  return `${window.location.origin}${imgPath.startsWith("/") ? "" : "/"}${imgPath}`
+}
 
 export const ProductScreen = () => {
   const { handleAddToCart } = useCart();
   const { id } = useParams();
 
   const [product, setProduct] = useState(null);
+  const [isProductLoading, setIsProductLoading] = useState(true);
+  const [productError, setProductError] = useState("");
   const [selectedSize, setSelectedSize] = useState("");
   const [isFavorite, setIsFavorite] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [dragOffset, setDragOffset] = useState(0);
+  const [isDraggingGallery, setIsDraggingGallery] = useState(false);
+  const dragStartX = useRef(0);
+  const dragOffsetX = useRef(0);
 
   useEffect(() => {
+    let isActive = true;
+
     const fetchProduct = async () => {
+      setIsProductLoading(true);
+      setProductError("");
+      setProduct(null);
+
       try {
         const data = await getProductById(id);
+        if (!isActive) return;
         setProduct(data);
       } catch (error) {
+        if (!isActive) return;
         console.error("Error fetching product", error);
+        setProductError("We could not find this product.");
+      } finally {
+        if (isActive) {
+          setIsProductLoading(false);
+        }
       }
     };
 
     fetchProduct();
+
+    return () => {
+      isActive = false;
+    };
+  }, [id]);
+
+  useEffect(() => {
+    setCurrentImageIndex(0);
+    setSelectedSize("");
+    setDragOffset(0);
+    dragOffsetX.current = 0;
   }, [id]);
 
   const productImages = useMemo(() => {
@@ -47,8 +78,40 @@ export const ProductScreen = () => {
     [product],
   );
 
-  if (!product) {
-    return <h1>Product not found</h1>;
+  if (isProductLoading) {
+    return (
+      <div className="page">
+        <Header />
+        <Nav />
+        <main className="product-screen product-screen--state">
+          <div className="product-state" role="status" aria-live="polite">
+            <span className="product-state__spinner" aria-hidden="true" />
+            <p className="product-state__eyebrow">Loading product</p>
+            <h1 className="product-state__title">Preparing the details</h1>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (productError || !product) {
+    return (
+      <div className="page">
+        <Header />
+        <Nav />
+        <main className="product-screen product-screen--state">
+          <div className="product-state product-state--error" role="alert">
+            <p className="product-state__eyebrow">Product unavailable</p>
+            <h1 className="product-state__title">This product could not be loaded.</h1>
+            <Link className="product-state__button" to="/collections">
+              Back to shop
+            </Link>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
   }
 
   const handlePrevImage = () => {
@@ -57,6 +120,46 @@ export const ProductScreen = () => {
 
   const handleNextImage = () => {
     setCurrentImageIndex((prev) => (prev === productImages.length - 1 ? 0 : prev + 1));
+  };
+
+  const handleGalleryPointerDown = (event) => {
+    if (productImages.length < 2) return;
+    dragStartX.current = event.clientX;
+    dragOffsetX.current = 0;
+    setIsDraggingGallery(true);
+    setDragOffset(0);
+    event.currentTarget.setPointerCapture?.(event.pointerId);
+  };
+
+  const handleGalleryPointerMove = (event) => {
+    if (!isDraggingGallery) return;
+    const nextOffset = event.clientX - dragStartX.current;
+    dragOffsetX.current = nextOffset;
+    setDragOffset(nextOffset);
+  };
+
+  const handleGalleryPointerEnd = (event) => {
+    if (!isDraggingGallery) return;
+
+    const swipeThreshold = 48;
+    const finalOffset = dragOffsetX.current;
+    if (finalOffset <= -swipeThreshold) {
+      handleNextImage();
+    }
+    if (finalOffset >= swipeThreshold) {
+      handlePrevImage();
+    }
+
+    setIsDraggingGallery(false);
+    setDragOffset(0);
+    dragOffsetX.current = 0;
+    event.currentTarget.releasePointerCapture?.(event.pointerId);
+  };
+
+  const handleGalleryKeyDown = (event) => {
+    if (productImages.length < 2) return;
+    if (event.key === "ArrowLeft") handlePrevImage();
+    if (event.key === "ArrowRight") handleNextImage();
   };
 
   const handleAddSelectedSize = () => {
@@ -73,40 +176,70 @@ export const ProductScreen = () => {
       <main className="product-screen">
         <div className="product">
           <section className="product__gallery">
-            <button
-              className="product__gallery-nav product__gallery-nav--prev"
-              onClick={handlePrevImage}
-              aria-label="Previous image"
+            {productImages.length > 1 && (
+              <div className="product__gallery-thumbs" aria-label="Product images">
+                {productImages.map((image, imageIndex) => (
+                  <button
+                    className={`product__gallery-thumb ${
+                      imageIndex === currentImageIndex ? "product__gallery-thumb--active" : ""
+                    }`}
+                    type="button"
+                    key={`${image}-${imageIndex}`}
+                    onClick={() => setCurrentImageIndex(imageIndex)}
+                    aria-label={`View product image ${imageIndex + 1}`}
+                    aria-current={imageIndex === currentImageIndex}
+                  >
+                    <img src={image} alt={`${product.name} thumbnail ${imageIndex + 1}`} />
+                  </button>
+                ))}
+              </div>
+            )}
+
+            <div
+              className={`product__gallery-main ${
+                isDraggingGallery ? "product__gallery-main--dragging" : ""
+              }`}
+              role="region"
+              tabIndex={0}
+              aria-label="Product image gallery"
+              onPointerDown={handleGalleryPointerDown}
+              onPointerMove={handleGalleryPointerMove}
+              onPointerUp={handleGalleryPointerEnd}
+              onPointerCancel={handleGalleryPointerEnd}
+              onKeyDown={handleGalleryKeyDown}
             >
-              {"<"}
-            </button>
-            <div className="product__gallery-main">
-              <img
-                src={productImages[currentImageIndex]}
-                alt={product.name}
-                className="product__gallery-image"
-              />
+              <div
+                className="product__gallery-track"
+                style={{
+                  transform: `translateX(calc(${-currentImageIndex * 100}% + ${dragOffset}px))`,
+                }}
+              >
+                {productImages.map((image, imageIndex) => (
+                  <div className="product__gallery-slide" key={`${image}-${imageIndex}`}>
+                    <img
+                      src={image}
+                      alt={`${product.name} ${imageIndex + 1}`}
+                      className="product__gallery-image"
+                      draggable="false"
+                    />
+                  </div>
+                ))}
+              </div>
               <button className="product__gallery-view-more">
                 {product.variants?.[0]?.size || "UNISEX"} - View more images
               </button>
             </div>
-            <button
-              className="product__gallery-nav product__gallery-nav--next"
-              onClick={handleNextImage}
-              aria-label="Next image"
-            >
-              {">"}
-            </button>
           </section>
 
           <section className="product__info">
             <div className="product__header">
               <button
-                className="product__favorite"
+                className={`product__favorite ${isFavorite ? "product__favorite--active" : ""}`}
                 onClick={() => setIsFavorite((current) => !current)}
-                aria-label="Add to favorites"
+                aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
+                aria-pressed={isFavorite}
               >
-                {isFavorite ? "Saved" : "Save"}
+                {isFavorite ? <Icons.HeartFilled /> : <Icons.Heart />}
               </button>
               <span className="product__sku">No. {product.sku || "N/A"}</span>
               <nav className="product__breadcrumb">

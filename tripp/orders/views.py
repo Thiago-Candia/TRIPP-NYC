@@ -9,11 +9,13 @@ except ImportError:
     mercadopago = None
 
 from django.conf import settings
+from django.db.models import Q
 from django.db import transaction
 from django.shortcuts import redirect
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -166,6 +168,7 @@ class CheckoutView(APIView):
         with transaction.atomic():
             order = Order.objects.create(
                 cart=cart,
+                user=request.user if request.user.is_authenticated else None,
                 email=data["email"],
                 first_name=data["first_name"],
                 last_name=data["last_name"],
@@ -276,16 +279,30 @@ class OrderDetailView(APIView):
         return Response(OrderSerializer(order).data)
 
 
+class MyOrdersView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        filters = Q(user=request.user)
+        if request.user.email:
+            filters |= Q(email__iexact=request.user.email)
+
+        orders = Order.objects.prefetch_related("items").filter(filters).distinct()
+        return Response(OrderSerializer(orders, many=True).data)
+
+
 class MercadoPagoReturnView(APIView):
     authentication_classes = []
     permission_classes = []
 
     def get(self, request, result):
         query_string = request.GET.urlencode()
-        if result == "failure":
-            target = _join_url(settings.FRONTEND_URL, "/checkout")
-        else:
-            target = _join_url(settings.FRONTEND_URL, "/order-success")
+        frontend_paths = {
+            "success": "/checkout/success",
+            "failure": "/checkout/failure",
+            "pending": "/checkout/pending",
+        }
+        target = _join_url(settings.FRONTEND_URL, frontend_paths.get(result, "/checkout/pending"))
 
         if query_string:
             target = f"{target}?{query_string}"
