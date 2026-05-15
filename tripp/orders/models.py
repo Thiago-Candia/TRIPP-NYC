@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 
 from cart.models import Cart
 from products.models import Product, ProductVariant
@@ -17,6 +18,13 @@ class Order(models.Model):
 
     cart = models.ForeignKey(
         Cart,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="orders",
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
         on_delete=models.SET_NULL,
         null=True,
         blank=True,

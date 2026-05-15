@@ -17,6 +17,8 @@ import { FaRegSmile } from "react-icons/fa";
 import { GoGear } from "react-icons/go";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { IoArrowBack } from "react-icons/io5";
+import { FaRegUser } from "react-icons/fa6";
+import { FaHeart, FaRegHeart } from "react-icons/fa";
 
 export const Icons = {
     Microphone: GrMicrophone,
@@ -37,5 +39,8 @@ export const Icons = {
     SmileEmoji: FaRegSmile,
     Gear: GoGear,
     VerticalOptions: BsThreeDotsVertical,
-    BackArrow: IoArrowBack
+    BackArrow: IoArrowBack,
+    Account: FaRegUser,
+    Heart: FaRegHeart,
+    HeartFilled: FaHeart
 }

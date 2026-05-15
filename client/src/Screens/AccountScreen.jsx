@@ -14,6 +14,10 @@ const AccountScreen = () => {
     return <Navigate to="/dashboard" replace />;
   }
 
+  if (user) {
+    return <Navigate to="/user" replace />;
+  }
+
   const submit = async (e) => {
     e.preventDefault();
     setError("");
@@ -23,7 +27,7 @@ const AccountScreen = () => {
       } else {
         await register(form);
       }
-      navigate("/dashboard");
+      navigate("/");
     } catch (error) {
       const backendDetail = error?.response?.data?.detail;
       setError(
@@ -37,7 +41,7 @@ const AccountScreen = () => {
     <section className="account-page">
       <div className="account-card">
         <h1 className="account-card__title">{mode === "login" ? "Ingresar" : "Crear cuenta"}</h1>
-        <p className="account-card__description">Accede como cliente para administrar tu tienda.</p>
+        <p className="account-card__description">Accede a tu cuenta para revisar tus compras.</p>
         <form className="account-card__form" onSubmit={submit}>
           <input
             className="account-card__input"

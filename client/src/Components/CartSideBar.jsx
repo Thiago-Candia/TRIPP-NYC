@@ -13,7 +13,7 @@ const CartSidebar = ({ isOpen, onClose }) => {
     return () => { document.body.style.overflow = ""; };
   }, [isOpen]);
 
-  if (!cart) return null;
+  if (!isOpen || !cart) return null;
 
   const handleCheckout = () => {
     onClose();

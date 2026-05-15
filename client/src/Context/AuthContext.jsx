@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { getMe, loginRequest, registerRequest } from "../api/auth";
 
 const AuthContext = createContext();
@@ -57,6 +57,13 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem("active_store_id", String(storeId));
     setActiveStoreId(String(storeId));
   }, []);
+
+  useEffect(() => {
+    const hasToken = Boolean(localStorage.getItem("access_token"));
+    if (!hasToken || user) return;
+
+    fetchCurrentUser().catch(() => logout());
+  }, [fetchCurrentUser, logout, user]);
 
   const value = useMemo(
     () => ({

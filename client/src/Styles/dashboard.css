@@ -289,6 +289,7 @@
   width: 100%;
   min-width: 760px;
   border-collapse: collapse;
+  table-layout: fixed;
 }
 
 .dashboard-table__th,
@@ -297,6 +298,7 @@
   padding: 12px;
   text-align: left;
   vertical-align: middle;
+  overflow: hidden;
 }
 
 .dashboard-table__th {
@@ -307,16 +309,70 @@
   text-transform: uppercase;
 }
 
+.dashboard-table__th:nth-child(1),
+.dashboard-table__td:nth-child(1) {
+  width: 34%;
+}
+
+.dashboard-table__th:nth-child(2),
+.dashboard-table__td:nth-child(2) {
+  width: 110px;
+}
+
+.dashboard-table__th:nth-child(3),
+.dashboard-table__td:nth-child(3) {
+  width: 90px;
+}
+
+.dashboard-table__th:nth-child(4),
+.dashboard-table__td:nth-child(4) {
+  width: 120px;
+}
+
+.dashboard-table__th:nth-child(5),
+.dashboard-table__td:nth-child(5) {
+  width: 280px;
+}
+
+.dashboard-table__td--price {
+  white-space: nowrap;
+}
+
+.dashboard-table__price {
+  display: inline-block;
+  min-width: 72px;
+  color: #111;
+  font-variant-numeric: tabular-nums;
+  text-decoration: none;
+}
+
 .dashboard-product-cell {
+  width: 34%;
+}
+
+.dashboard-product-cell__inner {
   align-items: center;
   display: flex;
   gap: 12px;
+  min-width: 0;
 }
 
 .dashboard-product-cell img {
   aspect-ratio: 1;
+  flex: 0 0 52px;
   object-fit: cover;
   width: 52px;
+}
+
+.dashboard-product-cell__text {
+  min-width: 0;
+}
+
+.dashboard-product-cell strong {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .dashboard-product-cell span {
@@ -324,6 +380,9 @@
   color: #666;
   font-size: 12px;
   margin-top: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .status-pill {

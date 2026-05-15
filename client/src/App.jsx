@@ -7,7 +7,8 @@ import CartScreen from './Screens/CartScreen'
 import DashboardScreen from './Screens/DashboardScreen'
 import AccountScreen from './Screens/AccountScreen'
 import CheckoutScreen from './Screens/CheckoutScreen'
-import OrderSuccessScreen from './Screens/OrderSuccessScreen'
+import CheckoutStatusScreen from './Screens/CheckoutStatusScreen'
+import UserProfileScreen from './Screens/UserProfileScreen'
 
 function App() {
 
@@ -20,8 +21,12 @@ function App() {
         <Route path='/cart' element={<CartScreen/>} />
         <Route path='/dashboard' element={<DashboardScreen/>} />
         <Route path='/account' element={<AccountScreen/>} />
+        <Route path='/user' element={<UserProfileScreen/>} />
         <Route path='/checkout' element={<CheckoutScreen/>} />
-        <Route path='/order-success' element={<OrderSuccessScreen/>} />
+        <Route path='/checkout/success' element={<CheckoutStatusScreen expectedStatus="success" />} />
+        <Route path='/checkout/failure' element={<CheckoutStatusScreen expectedStatus="failure" />} />
+        <Route path='/checkout/pending' element={<CheckoutStatusScreen expectedStatus="pending" />} />
+        <Route path='/order-success' element={<CheckoutStatusScreen expectedStatus="success" />} />
       </Routes>
     </>
   )
