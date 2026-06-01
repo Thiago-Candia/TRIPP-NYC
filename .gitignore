@@ -24,8 +24,12 @@ dist-ssr
 *.sw?
 
 # Dependency directories
+venv
 venv/
 .env
+.env.example
+tripp/.env.example
+tripp/.env
 .env.local
 pycache__/
 __pycache__/

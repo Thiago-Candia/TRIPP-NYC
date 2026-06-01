@@ -58,8 +58,10 @@ Recommended production environment:
 
 ```env
 SECRET_KEY=production-secret-key
-DEBUG=False
+DJANGO_DEBUG=False
 ALLOWED_HOSTS=api.your-domain.com
+CSRF_TRUSTED_ORIGINS=https://api.your-domain.com
+CORS_ALLOWED_ORIGINS=https://your-domain.com
 FRONTEND_URL=https://your-domain.com
 BACKEND_URL=https://api.your-domain.com
 MERCADOPAGO_ACCESS_TOKEN=APP_USR-your-production-token

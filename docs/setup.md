@@ -59,6 +59,11 @@ pip freeze > requirements.txt
 Create `tripp/.env`:
 
 ```env
+DJANGO_DEBUG=True
+SECRET_KEY=change-me-in-production
+ALLOWED_HOSTS=localhost,127.0.0.1
+CSRF_TRUSTED_ORIGINS=
+CORS_ALLOWED_ORIGINS=http://localhost:5173
 FRONTEND_URL=http://localhost:5173
 BACKEND_URL=http://localhost:8000
 MERCADOPAGO_ACCESS_TOKEN=TEST-your-access-token
@@ -78,6 +83,8 @@ Then update:
 
 ```env
 BACKEND_URL=https://your-ngrok-domain.ngrok-free.app
+ALLOWED_HOSTS=localhost,127.0.0.1,your-ngrok-domain.ngrok-free.app
+CSRF_TRUSTED_ORIGINS=https://your-ngrok-domain.ngrok-free.app
 ```
 
 Restart Django after changing `.env`.

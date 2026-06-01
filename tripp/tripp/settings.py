@@ -32,26 +32,44 @@ def load_local_env(path, override=False):
             os.environ[key] = value
 
 
+def env_bool(name, default=False):
+    value = os.getenv(name)
+    if value is None:
+        return default
+    return value.strip().lower() in {"1", "true", "yes", "on"}
+
+
+def env_list(name, default=None):
+    value = os.getenv(name)
+    if not value:
+        return default or []
+    return [item.strip() for item in value.split(",") if item.strip()]
+
+
+load_local_env(BASE_DIR / ".env", override=False)
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-9avau#^!pm(y8mma3g0+=3bwvs48kk0ncq@b)b08y*#2gd+9zc'
+DEBUG = env_bool("DJANGO_DEBUG", True)
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+SECRET_KEY = os.getenv("SECRET_KEY")
+if not SECRET_KEY:
+    if DEBUG:
+        SECRET_KEY = "django-insecure-local-development-key-change-me"
+    else:
+        raise RuntimeError("SECRET_KEY must be configured when DJANGO_DEBUG is false.")
 
-load_local_env(BASE_DIR / ".env", override=DEBUG)
+FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://localhost:5173')
+BACKEND_URL = os.getenv('BACKEND_URL', 'http://localhost:8000')
+MERCADOPAGO_ACCESS_TOKEN = os.getenv('MERCADOPAGO_ACCESS_TOKEN', '')
+MERCADOPAGO_WEBHOOK_SECRET = os.getenv('MERCADOPAGO_WEBHOOK_SECRET', '')
+CHECKOUT_SHIPPING_COST = os.getenv('CHECKOUT_SHIPPING_COST', '12.99')
 
-ALLOWED_HOSTS = [
-    "localhost",
-    "127.0.0.1",
-    "pagan-daybed-coronary.ngrok-free.dev",
-]
+ALLOWED_HOSTS = env_list("ALLOWED_HOSTS", ["localhost", "127.0.0.1"])
 
-CSRF_TRUSTED_ORIGINS = [
-    "https://pagan-daybed-coronary.ngrok-free.dev",
-]
+CSRF_TRUSTED_ORIGINS = env_list("CSRF_TRUSTED_ORIGINS", [])
 
 SITE_ID = 1
 
@@ -162,8 +180,6 @@ AUTHENTICATION_BACKENDS = [
 ACCOUNT_LOGIN_METHODS = {'username'}
 ACCOUNT_SIGNUP_FIELDS = ['email', 'username*', 'password1*', 'password2*']
 ACCOUNT_EMAIL_VERIFICATION = 'none'
-ACCOUNT_LOGIN_METHODS = {'username'}
-ACCOUNT_SIGNUP_FIELDS = ['email', 'username*', 'password1*', 'password2*']
 
 
 
@@ -220,12 +236,4 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CORS_ALLOW_CREDENTIALS = True
 
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost:5173'
-]
-
-FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://localhost:5173')
-BACKEND_URL = os.getenv('BACKEND_URL', 'http://localhost:8000')
-MERCADOPAGO_ACCESS_TOKEN = os.getenv('MERCADOPAGO_ACCESS_TOKEN', '')
-MERCADOPAGO_WEBHOOK_SECRET = os.getenv('MERCADOPAGO_WEBHOOK_SECRET', '')
-CHECKOUT_SHIPPING_COST = os.getenv('CHECKOUT_SHIPPING_COST', '12.99')
+CORS_ALLOWED_ORIGINS = env_list("CORS_ALLOWED_ORIGINS", [FRONTEND_URL])

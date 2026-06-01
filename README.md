@@ -138,6 +138,11 @@ http://localhost:8000
 Backend variables live in `tripp/.env`.
 
 ```env
+DJANGO_DEBUG=True
+SECRET_KEY=change-me-in-production
+ALLOWED_HOSTS=localhost,127.0.0.1
+CSRF_TRUSTED_ORIGINS=
+CORS_ALLOWED_ORIGINS=http://localhost:5173
 FRONTEND_URL=http://localhost:5173
 BACKEND_URL=http://localhost:8000
 MERCADOPAGO_ACCESS_TOKEN=TEST-your-access-token

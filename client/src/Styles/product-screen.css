@@ -104,9 +104,9 @@
 
 
 .product {
-  width: min(100%, 96rem);
+  width: min(100%, 110rem);
   display: grid;
-  grid-template-columns: minmax(35rem, 0.92fr) clamp(22rem, 28vw, 30rem);
+  grid-template-columns: minmax(0, 1fr) clamp(20rem, 26vw, 30rem);
   align-items: start;
   column-gap: clamp(1rem, 2vw, 2rem);
   margin: 0 auto;
@@ -162,9 +162,8 @@
 
 .product__gallery-main {
   position: relative;
-  width: min(100%, 42rem);
-  height: min(42rem, calc(100vh - 10rem));
-  min-height: 31rem;
+  width: 100%;
+  height: clamp(34rem, min(62vw, calc(100svh - 8rem)), 90rem);
   overflow: hidden;
   background-color: #f6f6f6;
   cursor: grab;
